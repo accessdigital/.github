@@ -15,9 +15,16 @@ on:
         description: 'Whether to generate a multi-dev safe branch name'
         type: boolean
         default: false
-      branch_prefix:
-        description: 'A prefix to strip from multi-dev safe branch names'
+        required: false
+      strip_prefix:
+        description: 'Optionally, a prefix to strip'
         type: string
+        required: false
+      safe_prefix:
+        description: 'Optional single letter safe prefix'
+        type: string
+        required: false
+        default: 't'
     secrets:
       PANTHEON_REPO:
         description: 'URL of the Pantheon repo.'
@@ -61,7 +68,12 @@ jobs:
 
       - name: Create multi-dev-safe branch name.
         if: inputs.multidev_safe
-        run: echo "BRANCH_NAME=$(./scripts/github/short-branch-name.sh "${BRANCH_NAME}")" >> $GITHUB_ENV
+        id: safe_branch
+        uses: accessdigital/.github/.github/actions/pantheon-safe-branch@pantheon-safe-branch-action
+        with:
+          branch_name: ${{ github.head_ref }}
+          strip_prefix: ${{ inputs.strip_prefix }}
+          safe_prefix: ${{ inputs.safe_prefix }}
 
       - name: Prepare for deployment to Pantheon.
         run: |
@@ -71,5 +83,5 @@ jobs:
 
       - name: Push the code to Pantheon.
         run: |
-          git push pantheon HEAD:refs/heads/${BRANCH_NAME} -f
-          echo "⚡ ${BRANCH_NAME} pushed to Pantheon!" >> $GITHUB_STEP_SUMMARY
+          git push pantheon HEAD:refs/heads/${{ steps.safe_branch.outputs.branch_name }} -f
+          echo "⚡ ${{ steps.safe_branch.outputs.branch_name }} pushed to Pantheon!" >> $GITHUB_STEP_SUMMARY
