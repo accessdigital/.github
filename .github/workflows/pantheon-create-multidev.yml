@@ -1,0 +1,57 @@
+name: Workflow to create a multi-dev on Pantheon.
+
+on:
+  workflow_call:
+    inputs:
+      pantheon_site_name:
+        description: 'Pantheon site name.'
+        type: string
+        required: true
+      branch_prefix:
+        description: 'A prefix to strip from multi-dev safe branch names'
+        type: string
+    secrets:
+      PANTHEON_MACHINE_TOKEN:
+        description: 'Machine token authorised to the Pantheon site.'
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  create-multidev:
+    name: 'Create a Pantheon multi-dev environment'
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.head_ref }}
+      PANTHEON_SITE_NAME: ${{ inputs.pantheon_site_name }}
+    steps:
+      # It's safe to use a checkout here, instead of the cached build, just to
+      # get access to the script.
+      - name: Check out the code
+        uses: actions/checkout@v3
+
+      - name: Create multi-dev-safe branch name.
+        run: echo "BRANCH_NAME=$(./scripts/github/short-branch-name.sh "${BRANCH_NAME}")" >> $GITHUB_ENV
+
+      - name: Installing PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: '7.4'
+
+      - name: Install Terminus.
+        uses: kopepasah/setup-pantheon-terminus@master
+        with:
+          pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
+
+      - name: Create or update a multidev environment.
+        env:
+          PANTHEON_SITE_URL: "pantheonsite.io"
+        run: |
+          terminus multidev:create \
+            $PANTHEON_SITE_NAME.dev $BRANCH_NAME \
+            --no-files \
+            --no-interaction
+          echo "⚡ Multidev site created!" >> $GITHUB_STEP_SUMMARY
+          echo "You can access it at: https://$BRANCH_NAME-$PANTHEON_SITE_NAME.$PANTHEON_SITE_URL" >> $GITHUB_STEP_SUMMARY
