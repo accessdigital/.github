@@ -44,7 +44,7 @@ jobs:
       - name: Restore build from a previous step.
         # Only restore if we have a source key.
         if: inputs.source_key != ''
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: restore-build
         with:
           path: ./*
@@ -69,7 +69,7 @@ jobs:
           echo "::set-output name=dir::$(composer config cache-dir)"
 
       - name: Preserve the composer cache.
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           # Save the cache with the hash of the lock files.
@@ -81,7 +81,7 @@ jobs:
             composer-
 
       - name: Preserve the npm cache.
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.npm

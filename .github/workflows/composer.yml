@@ -43,7 +43,7 @@ jobs:
       - name: Set up the build cache.
         # Only run if we have a target build.
         if: inputs.target_key != ''
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: target-build
         with:
           path: ./*
@@ -56,7 +56,7 @@ jobs:
         if: |
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.source_key != ''
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: restore-build
         with:
           path: ./*
@@ -90,7 +90,7 @@ jobs:
       - name: Preserve the composer cache.
         # Skip if we already have a full build.
         if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true')
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           # Save the cache with the hash of the lock files.
