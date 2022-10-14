@@ -64,15 +64,11 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
-        # Only if we do not have a source key.
-        if: inputs.source_key == ''
         id: composer-cache
         run: |
           echo "::set-output name=dir::$(composer config cache-dir)"
 
       - name: Preserve the composer cache.
-        # Only if we do not have a source key.
-        if: inputs.source_key == ''
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
@@ -85,8 +81,6 @@ jobs:
             composer-
 
       - name: Preserve the npm cache.
-        # Only if we do not have a source key.
-        if: inputs.source_key == ''
         uses: actions/cache@v2
         with:
           path: |
