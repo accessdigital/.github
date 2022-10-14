@@ -49,7 +49,7 @@ jobs:
         with:
           path: ./*
           # We are only interested in a direct hit.
-          key: build-${{ github.sha }}
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
 
       - name: Abort if we have a source build cache miss.
         run: exit 1
