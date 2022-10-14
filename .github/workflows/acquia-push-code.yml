@@ -11,6 +11,10 @@ on:
         description: 'The git committer email'
         type: string
         required: true
+      dry_run:
+        description: 'Whether this should be a dry-run only (no push to Acquia)'
+        type: boolean
+        required: true
       source_key:
         description: 'The source cache key suffix, or empty to checkout'
         type: string
@@ -97,12 +101,14 @@ jobs:
 
       - name: Deploy the artifact for branches
         if: startsWith(github.ref, 'refs/heads/')
+        env:
+          DRY_RUN: inputs.dry_run && '--dry-run'
         run: |
-          ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
+          ./vendor/bin/blt artifact:deploy --dry-run --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" $DRY_RUN --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
           echo "⚡ Branch ${COMMIT_REF:11}-build pushed to Acquia!" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_REF:10}] $COMMIT_MSG" --tag "${COMMIT_REF:10}-build" --no-interaction --verbose
+          ./vendor/bin/blt artifact:deploy --dry-run --commit-msg "[BUILD ${COMMIT_REF:10}] $COMMIT_MSG" $DRY_RUN --tag "${COMMIT_REF:10}-build" --no-interaction --verbose
           echo "⚡ Tag ${COMMIT_REF:10}-build pushed to Acquia!" >> $GITHUB_STEP_SUMMARY
