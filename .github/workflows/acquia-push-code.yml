@@ -45,6 +45,10 @@ jobs:
     name: 'Build artefact and push to Acquia'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
+    env:
+      COMMIT_MSG: ${{ github.event.head_commit.message }}
+      COMMIT_SHA: ${{ github.sha }}
+      COMMIT_REF: ${{ github.event.ref }}
     steps:
       - name: Restore build from a previous step.
         # Only restore if we have a source key.
@@ -105,8 +109,8 @@ jobs:
           config: ${{ secrets.SSH_CONFIG }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Deploy the artifact for branches
-        if: startsWith(github.ref, 'refs/heads/')
+      - name: Deploy the artifact for branches/pulls
+        if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/')
         env:
           DRY_RUN: inputs.dry_run && '--dry-run'
         run: |
