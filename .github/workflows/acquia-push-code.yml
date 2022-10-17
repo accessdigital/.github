@@ -79,6 +79,8 @@ jobs:
 
       - name: TMATE debugging
         uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
 
       - name: Get Composer Cache Directory
         id: composer-cache
