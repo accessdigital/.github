@@ -120,7 +120,7 @@ jobs:
       - name: Install composer dependencies.
         # Only if we do not have a source key.
         if: inputs.source_key == ''
-        run: composer -d "${{ inputs.directory }}" install --no-progress
+        run: composer install --no-progress
 
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
