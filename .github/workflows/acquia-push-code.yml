@@ -77,10 +77,15 @@ jobs:
         if: inputs.source_key == ''
         uses: actions/checkout@v3
 
-      - name: TMATE debugging
-        uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
+      - name: Get commit details for pull requests.
+        if: startsWith(github.ref, 'refs/pull/')
+        env:
+          COMMIT_BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "COMMIT_SHA=`git log -1 --pretty=format:"%s" | cut -d' ' -f2`" >> $GITHUB_ENV
+          echo "refs/heads/$COMMIT_BRANCH" >> $GITHUB_ENV
+          git fetch
+          echo "COMMIT_MSG=`git log -1 --pretty=format:"%s" origin/$COMMIT_BRANCH`" >> $GITHUB_ENV
 
       - name: Get Composer Cache Directory
         id: composer-cache
