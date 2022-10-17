@@ -123,7 +123,7 @@ jobs:
         run: composer -d "${{ inputs.directory }}" install --no-progress
 
       - name: Deploy the artifact for branches/pulls
-        if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/')
+        if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
           ./vendor/bin/blt artifact:deploy --dry-run --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" $DRY_RUN --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
           echo "⚡ Branch ${COMMIT_REF:11}-build pushed to Acquia!" >> $GITHUB_STEP_SUMMARY
