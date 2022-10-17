@@ -1,4 +1,4 @@
-name: Workflow to push a build artefact to Acquia.
+name: Workflow to push a BLT build artefact.
 
 on:
   workflow_call:
@@ -16,18 +16,18 @@ on:
         type: string
         required: true
       dry_run:
-        description: 'Whether this should be a dry-run only (no push to Acquia)'
+        description: 'Whether this should be a dry-run only (no push to artefact repo)'
         type: boolean
         required: true
       source_key:
         description: 'The source cache key suffix, or empty to checkout'
         type: string
     secrets:
-      ACQUIA_REPO:
-        description: 'URL of the Acquia repo.'
+      ARTEFACT_REPO:
+        description: 'URL of the artefact repo.'
         required: true
-      ACQUIA_SSH_KEY:
-        description: 'Private SSH key authorised to push to the Acquia repo.'
+      ARTEFACT_SSH_KEY:
+        description: 'Private SSH key authorised to push to the artefact repo.'
         required: true
       SSH_CONFIG:
         description: 'SSH configuration'
@@ -42,7 +42,7 @@ defaults:
 
 jobs:
   push-code:
-    name: 'Build artefact and push to Acquia'
+    name: 'Build artefact and push to repo'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     env:
@@ -50,6 +50,10 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
       COMMIT_REF: ${{ github.event.ref }}
       DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+      GIT_AUTHOR_NAME: ${{ inputs.git_name }}
+      GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
+      GIT_COMMITTER_NAME: ${{ inputs.git_name }}
+      GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
     steps:
       - name: Dump GitHub context
         id: github_context_step
@@ -85,6 +89,7 @@ jobs:
           echo "COMMIT_SHA=`git log -1 --pretty=format:"%s" | cut -d' ' -f2`" >> $GITHUB_ENV
           echo "COMMIT_REF=refs/heads/$COMMIT_BRANCH" >> $GITHUB_ENV
           echo "COMMIT_MSG=`curl -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_BRANCH` | grep '"message":' | grep -oE ': ".*",' | cut -c4- | rev | cut -c3- | rev" >> $GITHUB_ENV
+          echo $GITHUB_ENV
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -119,7 +124,7 @@ jobs:
       - name: Set up the SSH key and configuration.
         uses: shimataro/ssh-key-action@v2.3.1
         with:
-          key: ${{ secrets.ACQUIA_SSH_KEY }}
+          key: ${{ secrets.ARTEFACT_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
@@ -132,10 +137,10 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" $DRY_RUN --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
-          echo "⚡ Branch ${COMMIT_REF:11}-build pushed to Acquia!" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_REF:10}] $COMMIT_MSG" $DRY_RUN --tag "${COMMIT_REF:10}-build" --no-interaction --verbose
-          echo "⚡ Tag ${COMMIT_REF:10}-build pushed to Acquia!" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ Tag ${COMMIT_REF:10}-build pushed!" >> $GITHUB_STEP_SUMMARY
