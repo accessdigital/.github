@@ -87,14 +87,13 @@ jobs:
           echo "COMMIT_MSG=`curl -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_BRANCH | grep '"message":' | grep -oE ': ".*",' | cut -c4- | rev | cut -c3- | rev`" >> $GITHUB_ENV
 
       - name: Get Composer Cache Directory
-        id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-dir)"
+          echo "ACTIONS_COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
 
       - name: Preserve the composer cache.
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ env.ACTIONS_COMPOSER_CACHE_DIR }}
           # Save the cache with the hash of the lock files.
           key: composer-${{ hashFiles('**/composer.lock') }}
           # If there is no direct hit, restore the latest composer-* cache. This

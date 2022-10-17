@@ -83,16 +83,15 @@ jobs:
       - name: Get Composer Cache Directory
         # Skip if we already have a full build.
         if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true')
-        id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-dir)"
+          echo "ACTIONS_COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
 
       - name: Preserve the composer cache.
         # Skip if we already have a full build.
         if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true')
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ env.ACTIONS_COMPOSER_CACHE_DIR }}
           # Save the cache with the hash of the lock files.
           key: composer-${{ hashFiles('**/composer.lock') }}
           # If there is no direct hit, restore the latest composer-* cache. This
