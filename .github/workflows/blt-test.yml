@@ -1,0 +1,64 @@
+name: Workflow to run validation & tests via BLT.
+
+on:
+  workflow_call:
+    inputs:
+      container:
+        description: 'The docker image to use'
+        type: string
+        required: true
+      source_key:
+        description: 'The source cache key suffix, or empty to checkout'
+        type: string
+        default: 'composer'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: 'Validate'
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Disable telemetry.
+        run: ./vendor/bin/blt blt:telemetry:disable --no-interaction
+
+      - name: Run BLT validate.
+        run: ./vendor/bin/blt validate --no-interaction
+
+  test:
+    name: 'Test'
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Disable telemetry.
+        run: ./vendor/bin/blt blt:telemetry:disable --no-interaction
+
+      - name: Run BLT test.
+        run: ./vendor/bin/blt tests --no-interaction --verbose
