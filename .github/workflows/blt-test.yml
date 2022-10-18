@@ -60,5 +60,9 @@ jobs:
       - name: Disable telemetry.
         run: ./vendor/bin/blt blt:telemetry:disable --no-interaction
 
+      - uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
+
       - name: Run BLT test.
         run: ./vendor/bin/blt tests --define tests.run-server=true --no-interaction --verbose
