@@ -61,4 +61,4 @@ jobs:
         run: ./vendor/bin/blt blt:telemetry:disable --no-interaction
 
       - name: Run BLT test.
-        run: ./vendor/bin/blt tests --no-interaction --verbose
+        run: ./vendor/bin/blt tests --define tests.run-server=true --no-interaction --verbose
