@@ -11,9 +11,6 @@ try {
    branch = branch.substring(stripPrefix.length)
   }
 
-  // Branch names can only be 11 characters long and must be lowercase.
-  branch = branch.substring(0, 11).toLowerCase();
-
   // Replace any special characters with hyphens.
   branch = branch.replace(/[^a-z0-9-]/, '-');
 
@@ -21,6 +18,12 @@ try {
   if (!branch.match(/^[a-z]/)) {
     branch = safePrefix + branch;
   }
+
+  // Branch names can only be 11 characters long and must be lowercase.
+  branch = branch.substring(0, 11).toLowerCase();
+
+  // Trim trailing hyphens.
+  branch = branch.replace(/-+$/, '');
 
   core.setOutput('branch_name', branch);
   console.log(`Multi-dev safe branch name ${branch} [from ${sourceBranch}]`);
