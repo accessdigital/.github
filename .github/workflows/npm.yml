@@ -126,8 +126,8 @@ jobs:
 
       - name: Check for changes to committed code.
         run: |
-          git diff ${{ inputs.directory }}
-          git diff-index --quiet HEAD -- ${{ inputs.directory }}
+          git diff
+          git diff-index --quiet HEAD
 
       - name: Run tests.
         # Only run if requested.
