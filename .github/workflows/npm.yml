@@ -85,6 +85,8 @@ jobs:
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.source_key == ''
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - name: Preserve the npm cache.
         # Skip if we already have a full build.
@@ -123,10 +125,6 @@ jobs:
         if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.run_build
         run: npm --prefix "${{ inputs.directory }}" run build
-
-      - uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
 
       - name: Check for changes to committed code.
         run: |
