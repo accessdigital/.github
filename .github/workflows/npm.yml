@@ -22,6 +22,18 @@ on:
         description: 'Indicate we need to run SSH configuration for asset access'
         type: boolean
         default: false
+      run_build:
+        description: 'Optionally run `npm run build`'
+        type: boolean
+        default: true
+      check_git:
+        description: 'Optionally check for changes in git tracked files'
+        type: boolean
+        default: true
+      run_tests:
+        description: 'Optionally run `npm run test`'
+        type: boolean
+        default: false
     secrets:
       SSH_KEY:
         description: 'Private SSH key for any authenticated assets'
@@ -112,10 +124,16 @@ jobs:
 
       - name: Run the build.
         # Skip if we already have a full build.
-        if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true')
+        if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
+          inputs.run_build
         run: npm --prefix "${{ inputs.directory }}" run build
 
       - name: Check for changes to committed code.
+        if: inputs.check_git
         run: |
-          git diff ${{ inputs.directory }}
-          git diff-index --quiet HEAD -- ${{ inputs.directory }}
+          git diff
+          git diff-index --quiet HEAD
+
+      - name: Run tests.
+        if: inputs.run_tests
+        run: npm --prefix "${{ inputs.directory }}" run test
