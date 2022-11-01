@@ -22,6 +22,10 @@ on:
         description: 'Indicate we need to run SSH configuration for asset access'
         type: boolean
         default: false
+      run_tests:
+        description: 'Optionally run `npm test`'
+        type: boolean
+        default: false
     secrets:
       SSH_KEY:
         description: 'Private SSH key for any authenticated assets'
@@ -119,3 +123,8 @@ jobs:
         run: |
           git diff ${{ inputs.directory }}
           git diff-index --quiet HEAD -- ${{ inputs.directory }}
+
+      - name: Run tests.
+        # Only run if requested.
+        if: inputs.run_tests
+        run: npm --prefix "${{ inputs.directory }}" run test
