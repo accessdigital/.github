@@ -135,6 +135,5 @@ jobs:
           git diff-index --quiet HEAD
 
       - name: Run tests.
-        # Only run if requested.
         if: inputs.run_tests
         run: npm --prefix "${{ inputs.directory }}" run test
