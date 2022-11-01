@@ -26,6 +26,10 @@ on:
         description: 'Optionally run `npm run build`'
         type: boolean
         default: true
+      check_git:
+        description: 'Optionally check for changes in git tracked files'
+        type: boolean
+        default: true
       run_tests:
         description: 'Optionally run `npm run test`'
         type: boolean
@@ -85,8 +89,6 @@ jobs:
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.source_key == ''
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
 
       - name: Preserve the npm cache.
         # Skip if we already have a full build.
@@ -127,6 +129,7 @@ jobs:
         run: npm --prefix "${{ inputs.directory }}" run build
 
       - name: Check for changes to committed code.
+        if: inputs.check_git
         run: |
           git diff
           git diff-index --quiet HEAD
