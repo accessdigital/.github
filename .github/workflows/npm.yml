@@ -124,6 +124,10 @@ jobs:
           inputs.run_build
         run: npm --prefix "${{ inputs.directory }}" run build
 
+      - uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
+
       - name: Check for changes to committed code.
         run: |
           git diff
