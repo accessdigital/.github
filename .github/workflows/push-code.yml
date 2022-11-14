@@ -1,4 +1,4 @@
-name: Workflow to push a build artefact.
+name: Push a build artefact.
 
 on:
   workflow_call:

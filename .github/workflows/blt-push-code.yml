@@ -1,4 +1,4 @@
-name: Workflow to push a BLT build artefact.
+name: Build & push BLT artefact.
 
 on:
   workflow_call:
