@@ -81,7 +81,10 @@ jobs:
           key: ${{ secrets.ARTEFACT_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
+      - name: Setup tmate session
+          uses: mxschmitt/action-tmate@v3
+          with:
+            sudo: false
       - name: Add & fetch the artefact repo.
         run: |
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
