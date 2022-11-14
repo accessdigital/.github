@@ -3,6 +3,10 @@ name: Push a build artefact.
 on:
   workflow_call:
     inputs:
+      container:
+        description: 'The docker image to use'
+        type: string
+        required: true
       git_name:
         description: 'The git committer name'
         type: string
@@ -39,6 +43,7 @@ jobs:
   push-code:
     name: 'Push artefact to repo'
     runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
     env:
       COMMIT_MSG: ${{ github.event.head_commit.message }}
       COMMIT_SHA: ${{ github.sha }}
