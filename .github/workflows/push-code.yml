@@ -90,11 +90,6 @@ jobs:
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
           git fetch artefact
 
-      - uses: mxschmitt/action-tmate@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-        with:
-          sudo: false
       - name: Checkout artefact branch without changing local files.
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         env:
@@ -103,6 +98,7 @@ jobs:
         # replace this with trying to build on top of the parent when there
         # isn't a previous build in the same branch.
         run: |
+          git remote set-url origin $(git remote get-url origin | sed 's#https://#https://${{ secrets.GITHUB_TOKEN }}:${{ secrets.GITHUB_TOKEN }}@#')
           git fetch --unshallow origin
           git checkout -b ${COMMIT_REF:11}-build
           git reset --soft artefact/${COMMIT_REF:11}-build || true
