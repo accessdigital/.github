@@ -34,6 +34,10 @@ on:
         description: 'Optionally run `npm run test`'
         type: boolean
         default: false
+      fetch_depth:
+        description: 'The fetch depth when doing a clone'
+        type: integer
+        default: 1
     secrets:
       SSH_KEY:
         description: 'Private SSH key for any authenticated assets'
@@ -89,6 +93,8 @@ jobs:
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.source_key == ''
         uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.fetch_depth }}
 
       - name: Preserve the npm cache.
         # Skip if we already have a full build.
