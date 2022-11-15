@@ -100,7 +100,7 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
           git commit --allow-empty -m "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG"
-          git push -u artefact HEAD
+          git push artefact HEAD
           echo "🏗 Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy the artifact for tags
