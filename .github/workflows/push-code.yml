@@ -91,6 +91,8 @@ jobs:
           git fetch artefact
 
       - uses: mxschmitt/action-tmate@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
         with:
           sudo: false
       - name: Checkout artefact branch without changing local files.
