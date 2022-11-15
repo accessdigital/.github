@@ -34,9 +34,6 @@ on:
       KNOWN_HOSTS:
         description: 'SSH known hosts'
         required: true
-      GITHUB_TOKEN:
-        description: 'The github token, required for the unshallow fetch'
-        required: true
 
 defaults:
   run:
