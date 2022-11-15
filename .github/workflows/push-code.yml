@@ -90,6 +90,9 @@ jobs:
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
           git fetch artefact
 
+      - uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
       - name: Checkout artefact branch without changing local files.
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         env:
