@@ -26,13 +26,16 @@ on:
         description: 'URL of the artefact repo.'
         required: true
       ARTEFACT_SSH_KEY:
-        description: 'Private SSH key authorised to push to the artefact repo.'
+        description: 'Private SSH key authorised to push to the artefact repo'
         required: true
       SSH_CONFIG:
         description: 'SSH configuration'
         required: true
       KNOWN_HOSTS:
         description: 'SSH known hosts'
+        required: true
+      GITHUB_TOKEN:
+        description: 'The github token, required for the unshallow fetch'
         required: true
 
 defaults:
