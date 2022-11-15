@@ -34,6 +34,9 @@ on:
       KNOWN_HOSTS:
         description: 'SSH known hosts'
         required: true
+      GITHUB_ACCESS_TOKEN:
+        description: 'The github token, required for the unshallow fetch'
+        required: true
 
 defaults:
   run:
@@ -89,6 +92,8 @@ jobs:
 
       - name: Checkout artefact branch without changing local files.
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
         # Include an unshallow fetch of origin so that we have history. At some
         # replace this with trying to build on top of the parent when there
         # isn't a previous build in the same branch.
