@@ -1,4 +1,4 @@
-name: Workflow to run validation & tests via BLT.
+name: Validation & tests via BLT.
 
 on:
   workflow_call:
@@ -44,6 +44,16 @@ jobs:
     name: 'Test'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
+    services:
+      db:
+        image: mysql:5.7
+        ports: [ 3306 ]
+        env:
+          MYSQL_USER: db
+          MYSQL_PASSWORD: db
+          MYSQL_DATABASE: db
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     steps:
       - name: Restore build from a previous step.
         uses: actions/cache@v3
@@ -51,18 +61,25 @@ jobs:
         with:
           path: ./*
           # We are only interested in a direct hit.
-          key: build-${{ github.sha }}-${{ inputs.source_key }}
+          key: build-${{ github.sha }}-composer
 
       - name: Abort if we have a source build cache miss.
         run: exit 1
         if: steps.restore-build.outputs.cache-hit != 'true'
 
-      - name: Disable telemetry.
-        run: ./vendor/bin/blt blt:telemetry:disable --no-interaction
-
-      - uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
+      - name: Configure Drupal settings.
+        run: |
+          cp docroot/sites/default/settings.ci.php docroot/sites/default/settings.local.php
+          ./vendor/bin/drush status
 
       - name: Run BLT test.
-        run: ./vendor/bin/blt tests --define tests.run-server=true --no-interaction --verbose
+        env:
+          SIMPLETEST_BASE_URL: 'http://127.0.0.1:8888'
+        # drush runserver requires a full bootstrap, so use php -S directly.
+        run: |
+          (cd docroot && php -S 127.0.0.1:8888 .ht.router.php > /tmp/php-log.txt 2>&1 & )
+          ./vendor/bin/phpunit -c phpunit.xml docroot/modules/custom/
+
+      - name: Output PHP logs on error.
+        if: failure()
+        run: cat /tmp/php-log.txt
