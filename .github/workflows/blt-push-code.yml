@@ -24,8 +24,7 @@ on:
         type: string
     secrets:
       ARTEFACT_REPO:
-        description: 'URL of the artefact repo.'
-        required: true
+        description: 'UNUSED'
       ARTEFACT_SSH_KEY:
         description: 'Private SSH key authorised to push to the artefact repo.'
         required: true
