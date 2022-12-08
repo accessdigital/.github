@@ -20,6 +20,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  CI: GITHUB_ACTIONS
+
 jobs:
   validate:
     name: 'Validate'
