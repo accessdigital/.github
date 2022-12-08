@@ -49,11 +49,21 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
       COMMIT_REF: ${{ github.event.ref }}
       DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
+      DRY_RUN2: ${{ inputs.dry_run && '--dry-run' || '' }}
       GIT_AUTHOR_NAME: ${{ inputs.git_name }}
       GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
       GIT_COMMITTER_NAME: ${{ inputs.git_name }}
       GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
     steps:
+      - name: dump context
+        env:
+          GH_INPUTS: ${{ toJson(inputs) }}
+          GH_ENV: ${{ toJson(env) }}
+        run: |
+          echo "$GH_INPUTS"
+          echo "$GH_ENV"
+          exit 1
+      
       - name: Restore build from a previous step.
         # Only restore if we have a source key.
         if: inputs.source_key != ''
