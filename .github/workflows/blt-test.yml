@@ -86,7 +86,7 @@ jobs:
         # drush runserver requires a full bootstrap, so use php -S directly.
         run: |
           (cd docroot && php -S 127.0.0.1:8888 .ht.router.php > /tmp/php-log.txt 2>&1 & )
-          ./vendor/bin/phpunit -c phpunit.xml docroot/modules/custom/
+          ./vendor/bin/blt tests
 
       - name: Output PHP logs on error.
         if: failure()
