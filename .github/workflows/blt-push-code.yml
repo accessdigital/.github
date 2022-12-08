@@ -48,7 +48,7 @@ jobs:
       COMMIT_MSG: ${{ github.event.head_commit.message }}
       COMMIT_SHA: ${{ github.sha }}
       COMMIT_REF: ${{ github.event.ref }}
-      DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
+      DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
       GIT_AUTHOR_NAME: ${{ inputs.git_name }}
       GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
       GIT_COMMITTER_NAME: ${{ inputs.git_name }}
@@ -130,10 +130,10 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" $DRY_RUN --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
-          [ -z "$DRY_RUN" ] && echo "🥪 Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY
+          [ -z "$DRY_RUN" ] && echo "🥪 Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY || true
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_REF:10}] $COMMIT_MSG" $DRY_RUN --tag "${COMMIT_REF:10}-build" --no-interaction --verbose
-          [ -z "$DRY_RUN" ] && echo echo "🥪 Tag ${COMMIT_REF:10}-build pushed!" >> $GITHUB_STEP_SUMMARY
+          [ -z "$DRY_RUN" ] && echo echo "🥪 Tag ${COMMIT_REF:10}-build pushed!" >> $GITHUB_STEP_SUMMARY || true
