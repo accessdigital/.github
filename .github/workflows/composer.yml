@@ -126,5 +126,6 @@ jobs:
 
       - name: Check for changes to committed code.
         run: |
+          git config --global --add safe.directory $(realpath .)
           git diff ${{ inputs.directory }}
           git diff-index --quiet HEAD -- ${{ inputs.directory }}

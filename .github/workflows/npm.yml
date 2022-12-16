@@ -131,6 +131,7 @@ jobs:
       - name: Check for changes to committed code.
         if: inputs.check_git
         run: |
+          git config --global --add safe.directory $(realpath .)
           git diff
           git diff-index --quiet HEAD
 
