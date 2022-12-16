@@ -79,6 +79,7 @@ jobs:
         run: |
           git config --global user.name $GIT_COMMITTER_NAME
           git config --global user.email "$GIT_COMMITTER_EMAIL"
+          git config --global --add safe.directory $(realpath .)
           git remote add pantheon $PANTHEON_REPO
 
       - name: Push the code to Pantheon.

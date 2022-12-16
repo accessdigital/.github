@@ -108,7 +108,9 @@ jobs:
           safe_prefix: safe_prefix
 
       - name: Add Pantheon as a remote.
-        run: git remote add pantheon $PANTHEON_REPO
+        run: |
+          git config --global --add safe.directory $(realpath .)
+          git remote add pantheon $PANTHEON_REPO
 
       - name: Delete the branch from Pantheon.
         # Don't mark this as a build fail if the branch doesn't delete.

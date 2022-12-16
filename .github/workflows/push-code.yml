@@ -87,6 +87,7 @@ jobs:
 
       - name: Add & fetch the artefact repo.
         run: |
+          git config --global --add safe.directory $(realpath .)
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
           git fetch artefact
 
