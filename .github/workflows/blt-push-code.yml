@@ -124,7 +124,7 @@ jobs:
       - name: Install composer dependencies.
         # Only if we do not have a source key.
         if: inputs.source_key == ''
-        run: composer install --no-
+        run: composer install --no-progress
         
       - name: Disable git safe directories as we are in a container.
         run: git config --global --add safe.directory '*'
