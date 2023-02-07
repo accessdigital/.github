@@ -124,18 +124,19 @@ jobs:
       - name: Install composer dependencies.
         # Only if we do not have a source key.
         if: inputs.source_key == ''
-        run: composer install --no-progress
-
+        run: composer install --no-
+        
+      - name: Disable git safe directories as we are in a container.
+        run: git config --global --add safe.directory '*'
+        
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
-          git config --global --add safe.directory $(realpath .)
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG" $DRY_RUN --branch "${COMMIT_REF:11}-build" --no-interaction --verbose
           [ -z "$DRY_RUN" ] && echo "🥪 Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY || true
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          git config --global --add safe.directory $(realpath .)
           ./vendor/bin/blt artifact:deploy --commit-msg "[BUILD ${COMMIT_REF:10}] $COMMIT_MSG" $DRY_RUN --tag "${COMMIT_REF:10}-build" --no-interaction --verbose
           [ -z "$DRY_RUN" ] && echo echo "🥪 Tag ${COMMIT_REF:10}-build pushed!" >> $GITHUB_STEP_SUMMARY || true
