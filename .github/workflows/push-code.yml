@@ -57,6 +57,9 @@ jobs:
       GIT_COMMITTER_NAME: ${{ inputs.git_name }}
       GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
     steps:
+      - name: Disable git safe directories as we are in a container.
+        run: git config --global --add safe.directory '*'
+
       - name: Restore build from a previous step.
         uses: actions/cache@v3
         id: restore-build
