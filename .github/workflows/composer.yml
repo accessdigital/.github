@@ -44,6 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     steps:
+      - name: Disable git safe directories as we are in a container.
+        run: git config --global --add safe.directory '*'
+
       - name: Set up the build cache.
         # Only run if we have a target build.
         if: inputs.target_key != ''
