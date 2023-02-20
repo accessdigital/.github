@@ -33,6 +33,8 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v3
         with:
+          # Ensure PRs check out the right commit.
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
           # Use a substantial depth so platform.sh doesn't have orphans.
           fetch-depth: 50
 
@@ -47,4 +49,4 @@ jobs:
         run: git remote add target ${{ secrets.TARGET_REPO }}
 
       - name: Push branch
-        run: git push target HEAD:${{ inputs.target_ref || github.ref }} --force
+        run: git push target HEAD:${{ inputs.target_ref || github.event.pull_request.head.ref || github.ref }} --force
