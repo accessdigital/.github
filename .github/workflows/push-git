@@ -1,0 +1,45 @@
+name: Push a git branch
+
+on:
+  workflow_call:
+    secrets:
+      TARGET_REPO:
+        description: 'URL of the target repo.'
+        required: true
+      TARGET_SSH_KEY:
+        description: 'Private SSH key authorised to push to the target repo'
+        required: true
+      SSH_CONFIG:
+        description: 'SSH configuration'
+        required: true
+      KNOWN_HOSTS:
+        description: 'SSH known hosts'
+        required: true      
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  push-code:
+    name: 'Push branch to repo'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3
+        with:
+          # Use a substantial depth so platform.sh doesn't have orphans.
+          fetch-depth: 50
+
+      - name: Set up the SSH key and configuration
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.PLATFORM_SSH_KEY }}
+          config: ${{ secrets.SSH_CONFIG }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Add the Platform.sh remote
+        run: git remote add target ${{ secrets.PLATFORM_REPO }}
+
+      - name: Push branch to Platform.sh
+        run: git push target ${GITHUB_REF:11} --force
