@@ -42,4 +42,4 @@ jobs:
         run: git remote add target ${{ secrets.TARGET_REPO }}
 
       - name: Push branch to Platform.sh
-        run: git push target HEAD --force
+        run: git push target ${{ github.ref_name }} --force
