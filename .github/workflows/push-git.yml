@@ -48,7 +48,5 @@ jobs:
       - name: Add the git remote
         run: git remote add target ${{ secrets.TARGET_REPO }}
 
-      - name: 
-
       - name: Push branch
         run: git push target HEAD:${{ inputs.target_ref || (github.event.pull_request.head.ref && format('/refs/heads/{0}', github.event.pull_request.head.ref) ) || github.ref }} --force
