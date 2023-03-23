@@ -55,6 +55,9 @@ jobs:
       - name: Disable git safe directories as we are in a container.
         run: git config --global --add safe.directory '*'
 
+      - name: Allow bower to run as root..
+        run: echo '{ "allow_root": true }' > /root/.bowerrc
+
       - name: Set up the build cache.
         # Only run if we have a target build.
         if: inputs.target_key != ''
