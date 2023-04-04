@@ -48,11 +48,19 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     env:
-      COMMIT_MSG: ${{ github.event.head_commit.message }}
-      COMMIT_SHA: ${{ github.sha }}
-      COMMIT_REF: ${{ github.event.ref }}
-      CURRENT_BRANCH: ${{ github.event.base_ref }}
-      DEFAULT_BRANCH: ${{ github.repository.default_branch }}
+      SOURCE_MSG: ${{ github.event.head_commit.message }}
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      SOURCE_SHA_SHORT: ${SOURCE_SHA:0:7}
+      SOURCE_BRANCH_PUSH_FQ: ${{ github.event.base_ref || github.ref }}
+      SOURCE_BRANCH_PUSH: ${SOURCE_BRANCH_PUSH_FQ:11}
+      SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
+      SOURCE_TAG_FQ: ${{ github.ref }}
+      SOURCE_TAG: ${SOURCE_TAG_FQ:10}
+      TARGET_SHA: ${{ github.event.pull_request.base.sha }}
+      TARGET_SHA_SHORT: ${TARGET_SHA:0:7}
+      TARGET_BRANCH: ${{ github.base_ref }}
+      BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_TAG || env.SOURCE_SHA_SHORT }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
       GIT_AUTHOR_NAME: ${{ inputs.git_name }}
       GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
@@ -62,14 +70,10 @@ jobs:
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          GITHUB_ENV: ${{ toJson(env) }}
         run: |
           echo "Context: $GITHUB_CONTEXT"
-          echo "COMMIT_MSG: $COMMIT_MSG"
-          echo "COMMIT_SHA: $COMMIT_SHA"
-          echo "COMMIT_REF: $COMMIT_REF
-          echo "CURRENT_BRANCH: $CURRENT_BRANCH"
-          echo "PARENT: "
-          echo "DEFAULT_BRANCH: $DEFAULT_BRANCH"
+          echo "Env: $GITHUB_ENV"
         
       - name: Disable git safe directories as we are in a container.
         run: git config --global --add safe.directory '*'
