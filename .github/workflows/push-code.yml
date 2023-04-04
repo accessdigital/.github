@@ -50,13 +50,9 @@ jobs:
     env:
       SOURCE_MSG: ${{ github.event.head_commit.message }}
       SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      SOURCE_SHA_SHORT: ${SOURCE_SHA:0:7}
       SOURCE_BRANCH_PUSH_FQ: ${{ github.event.base_ref || github.ref }}
-      SOURCE_BRANCH_PUSH: ${SOURCE_BRANCH_PUSH_FQ:11}
       SOURCE_TAG_FQ: ${{ github.ref }}
-      SOURCE_TAG: ${SOURCE_TAG_FQ:10}
       TARGET_SHA: ${{ github.event.pull_request.base.sha }}
-      TARGET_SHA_SHORT: ${TARGET_SHA:0:7}
       TARGET_BRANCH: ${{ github.base_ref }}
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
@@ -82,11 +78,14 @@ jobs:
 
       - name: Set up commit vars.
         env:
-          SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
-          BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_SHA_SHORT }}
+          SOURCE_SHA_SHORT: ${SOURCE_SHA:0:7}
+          TARGET_SHA_SHORT: ${TARGET_SHA:0:7}
+          SOURCE_BRANCH_PUSH: ${SOURCE_BRANCH_PUSH_FQ:11}
         run: |
-          echo "SOURCE_BRANCH=${SOURCE_BRANCH}" >> $GITHUB_ENV
-          echo "BUILD_REF=${BUILD_REF}" >> $GITHUB_ENV
+          echo "SOURCE_TAG=${SOURCE_SHA:0:7}" >> $GITHUB_ENV
+          echo "SOURCE_BRANCH=${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}" >> $GITHUB_ENV
+          echo "SOURCE_TAG=${SOURCE_TAG_FQ:10}" >> $GITHUB_ENV
+          echo "BUILD_REF=${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_SHA_SHORT }}" >> $GITHUB_ENV
           
       - name: Get commit message for pull requests.
         if: startsWith(github.ref, 'refs/pull/')
