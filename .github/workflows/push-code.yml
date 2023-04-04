@@ -53,13 +53,11 @@ jobs:
       SOURCE_SHA_SHORT: ${SOURCE_SHA:0:7}
       SOURCE_BRANCH_PUSH_FQ: ${{ github.event.base_ref || github.ref }}
       SOURCE_BRANCH_PUSH: ${SOURCE_BRANCH_PUSH_FQ:11}
-      SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
       SOURCE_TAG_FQ: ${{ github.ref }}
       SOURCE_TAG: ${SOURCE_TAG_FQ:10}
       TARGET_SHA: ${{ github.event.pull_request.base.sha }}
       TARGET_SHA_SHORT: ${TARGET_SHA:0:7}
       TARGET_BRANCH: ${{ github.base_ref }}
-      BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_TAG || env.SOURCE_SHA_SHORT }}
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
       GIT_AUTHOR_NAME: ${{ inputs.git_name }}
@@ -69,11 +67,11 @@ jobs:
     steps:
       - name: Dump GitHub context
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-          GITHUB_ENV: ${{ toJson(env) }}
+          SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
+          BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_TAG || env.SOURCE_SHA_SHORT }}
         run: |
-          echo "Context: $GITHUB_CONTEXT"
-          echo "Env: $GITHUB_ENV"
+          echo "Context: ${{ toJson(github) }}"
+          echo "Env: ${{ toJson(env) }}"
         
       - name: Disable git safe directories as we are in a container.
         run: git config --global --add safe.directory '*'
