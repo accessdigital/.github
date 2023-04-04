@@ -65,14 +65,6 @@ jobs:
       GIT_COMMITTER_NAME: ${{ inputs.git_name }}
       GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
     steps:
-      - name: Dump GitHub context
-        env:
-          SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
-          BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_TAG || env.SOURCE_SHA_SHORT }}
-        run: |
-          echo "Context: ${{ toJson(github) }}"
-          echo "Env: ${{ toJson(env) }}"
-        
       - name: Disable git safe directories as we are in a container.
         run: git config --global --add safe.directory '*'
 
@@ -88,13 +80,19 @@ jobs:
         run: exit 1
         if: steps.restore-build.outputs.cache-hit != 'true'
 
-      - name: Get commit details for pull requests.
+      - name: Set up commit vars.
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref || env.SOURCE_BRANCH_PUSH }}
+          BUILD_REF: ${{ github.event_name == 'pull_request' && format('{0} / {1}', env.SOURCE_SHA_SHORT, env.TARGET_SHA_SHORT) || env.SOURCE_SHA_SHORT }}
+        run: |
+          echo "SOURCE_BRANCH=${SOURCE_BRANCH}" >> $GITHUB_ENV
+          echo "BUILD_REF=${BUILD_REF}" >> $GITHUB_ENV
+          
+      - name: Get commit message for pull requests.
         if: startsWith(github.ref, 'refs/pull/')
         env:
           COMMIT_BRANCH: ${{ github.head_ref }}
         run: |
-          echo "COMMIT_SHA=`git log -1 --pretty=format:"%s" | cut -d' ' -f2`" >> $GITHUB_ENV
-          echo "COMMIT_REF=refs/heads/$COMMIT_BRANCH" >> $GITHUB_ENV
           echo "COMMIT_MSG=`curl -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_BRANCH | grep '"message":' | grep -oE ': ".*",' | cut -c4- | rev | cut -c3- | rev`" >> $GITHUB_ENV
 
       - name: Set up the SSH key and configuration.
@@ -106,12 +104,10 @@ jobs:
 
       - name: Add & fetch the artefact repo.
         run: |
-          git config --global --add safe.directory $(realpath .)
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
           git fetch artefact
 
       - name: Checkout artefact branch without changing local files.
-        if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
         # Include an unshallow fetch of origin so that we have history. At some
@@ -120,8 +116,8 @@ jobs:
         run: |
           git remote set-url origin $(git remote get-url origin | sed 's#https://#https://${{ secrets.GITHUB_TOKEN }}:${{ secrets.GITHUB_TOKEN }}@#')
           git fetch --unshallow origin
-          git checkout -b ${COMMIT_REF:11}-build
-          git reset --soft artefact/${COMMIT_REF:11}-build || true
+          git checkout -b ${SOURCE_BRANCH}-build
+          git reset --soft artefact/${SOURCE_BRANCH}-build || git reset --soft artefact/${TARGET_BRANCH}-build || git reset --soft artefact/${DEFAULT_BRANCH}-build
 
       - name: Add the build files.
         run: git add -f ${{ inputs.add_files }}
@@ -129,14 +125,15 @@ jobs:
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
-          git commit --allow-empty -m "[BUILD ${COMMIT_SHA:0:7}] $COMMIT_MSG"
-          git push artefact HEAD
-          echo "🏗 Branch ${COMMIT_REF:11}-build pushed!" >> $GITHUB_STEP_SUMMARY
+          git commit --allow-empty -m "[$BUILD_REF] $COMMIT_MSG"
+          git push artefact HEAD:refs/heads/$SOURCE_BRANCH-build --force
+          echo "🏗 Branch ${SOURCE_BRANCH}-build pushed!" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          git commit --allow-empty -m "[BUILD ${COMMIT_SHA:0:7}] Tag ${COMMIT_REF:10}"
-          git tag ${COMMIT_REF:10}-build
-          git push artefact ${COMMIT_REF:10}-build
-          echo "🏗 Tag ${COMMIT_REF:10}-build pushed!" >> $GITHUB_STEP_SUMMARY
+          git commit --allow-empty -m "[$BUILD_REF / $SOURCE_SHA_SHORT] $COMMIT_MSG"
+          git push artefact HEAD:refs/heads/${SOURCE_TAG}-tag-build --force
+          git tag ${SOURCE_TAG}-build
+          git push artefact ${SOURCE_TAG}-build
+          echo "🏗 Tag ${SOURCE_TAG}-build pushed!" >> $GITHUB_STEP_SUMMARY
