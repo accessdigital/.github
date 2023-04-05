@@ -126,14 +126,14 @@ jobs:
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         run: |
-          git commit --allow-empty -m "[$BUILD_REF] $SOURCE_MSG"
+          git commit --allow-empty -m "[BUILD $BUILD_REF] $SOURCE_MSG"
           git push artefact HEAD:refs/heads/$SOURCE_BRANCH-build --force
           echo "🏗 Branch ${SOURCE_BRANCH}-build pushed!" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy the artifact for tags
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          git commit --allow-empty -m "[$BUILD_REF / $SOURCE_SHA_SHORT] $SOURCE_MSG"
+          git commit --allow-empty -m "[BUILD $BUILD_REF / $SOURCE_SHA_SHORT] $SOURCE_MSG"
           git push artefact HEAD:refs/heads/${SOURCE_TAG}-tag-build --force
           git tag ${SOURCE_TAG}-build
           git push artefact ${SOURCE_TAG}-build
