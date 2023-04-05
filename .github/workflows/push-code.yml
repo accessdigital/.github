@@ -134,7 +134,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           git commit --allow-empty -m "[BUILD ${SOURCE_TAG} / $BUILD_REF] $SOURCE_MSG"
-          git push artefact HEAD:refs/heads/${SOURCE_TAG}-tag-build --force
           git tag ${SOURCE_TAG}-build
           git push artefact ${SOURCE_TAG}-build
           echo "🏗 Tag ${SOURCE_TAG}-build pushed!" >> $GITHUB_STEP_SUMMARY
