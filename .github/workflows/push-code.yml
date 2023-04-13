@@ -82,7 +82,7 @@ jobs:
           echo "COMMIT_MSG=`curl -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_BRANCH | grep '"message":' | grep -oE ': ".*",' | cut -c4- | rev | cut -c3- | rev`" >> $GITHUB_ENV
 
       - name: Set up the SSH key and configuration.
-        uses: shimataro/ssh-key-action@v2.4.0
+        uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.ARTEFACT_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
