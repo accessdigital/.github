@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 50
 
       - name: Set up the SSH key and configuration
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.TARGET_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
