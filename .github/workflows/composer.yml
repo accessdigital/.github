@@ -116,7 +116,7 @@ jobs:
         if: |
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.ssh_config
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
