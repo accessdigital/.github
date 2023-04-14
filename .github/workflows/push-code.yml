@@ -21,6 +21,7 @@ on:
       add_files:
         description: 'The files/directories to add, bypassing .gitignore'
         type: string
+        default: '-A'
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
