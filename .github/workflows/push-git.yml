@@ -35,8 +35,8 @@ jobs:
         with:
           # Ensure PRs check out the right commit.
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
-          # Use a substantial depth so platform.sh doesn't have orphans.
-          fetch-depth: 50
+          # Perform a full checkout to prevent orphaned commits.
+          fetch-depth: 0
 
       - name: Set up the SSH key and configuration
         uses: shimataro/ssh-key-action@v2.3.1
