@@ -26,6 +26,10 @@ on:
         description: 'Additional options to pass to composer'
         type: string
         default: ''
+      cross_os:
+        description: 'Whether to allow caching across OS'
+        type: boolean
+        default: false
     secrets:
       SSH_KEY:
         description: 'Private SSH key for any authenticated assets'
@@ -56,6 +60,7 @@ jobs:
           path: ./*
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.target_key }}
+          enableCrossOsArchive: inputs.cross_os
 
       - name: Restore build from a previous step.
         # Skip if we already have a full build.
@@ -69,6 +74,7 @@ jobs:
           path: ./*
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
+          enableCrossOsArchive: inputs.cross_os
 
       - name: Abort if we have a source build cache miss.
         run: exit 1
