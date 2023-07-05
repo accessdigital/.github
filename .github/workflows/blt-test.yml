@@ -82,6 +82,7 @@ jobs:
 
       - name: Run BLT test.
         env:
+          SIMPLETEST_DB: 'mysql://db:db@db:3306/db'
           SIMPLETEST_BASE_URL: 'http://127.0.0.1:8888'
         # drush runserver requires a full bootstrap, so use php -S directly.
         run: |
