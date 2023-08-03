@@ -3,10 +3,6 @@ name: Workflow to backup databases on Acquia.
 on:
   workflow_call:
     inputs:
-      environment_id:
-        description: 'Acquia environment ID.'
-        type: string
-        required: true
       filter:
         description: 'Optionally, provide a filter for the databases. See: https://docs.acquia.com/acquia-cli/commands/#api-environments-database-list'
         type: string
@@ -17,6 +13,9 @@ on:
         required: false
         default: '8.2'
     secrets:
+      ENVIRONMENT_ID:
+        description: 'Acquia environment ID.'
+        required: true
       ACLI_CLIENT_ID:
         description: 'The client ID for authenticating with ACLI.'
         required: true
@@ -63,13 +62,13 @@ jobs:
         run: |
           acli api:environments:database-list \
             --filter="${{ inputs.filter }}" \
-            ${{ inputs.environment_id }} \
+            ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name' >> $GITHUB_OUPUT
 
       - name: Backing up databases
         run: |
           while read database; do \
-            acli api:environments:database-backup-create ${{ inputs.environment_id }} $database \
+            acli api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database \
               && echo "💧 Successfully backed up database $database!" \
-              || echo "❌ Error backing up database $database. See logs." \
+              || echo "❌ Error backing up database $database. See logs."; exit 1 \
           done <${{ steps.get_databases.outputs.databases }}
