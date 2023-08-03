@@ -44,7 +44,7 @@ jobs:
 
       - name: Installing dependencies
         run: |
-          curl -OL https://github.com/acquia/cli/releases/2.13.0/download/acli.phar
+          curl -OL https://github.com/acquia/cli/releases/download/2.13.0/acli.phar
           echo "ACLI downloaded!"
 
       - name: Authorizing with ACLI
