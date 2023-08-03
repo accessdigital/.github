@@ -1,0 +1,75 @@
+name: Workflow to backup databases on Acquia.
+
+on:
+  workflow_call:
+    inputs:
+      environment_id:
+        description: 'Acquia environment ID.'
+        type: string
+        required: true
+      filter:
+        description: 'Optionally, provide a filter for the databases. See: https://docs.acquia.com/acquia-cli/commands/#api-environments-database-list'
+        type: string
+        required: false
+      php_version:
+        description: 'Optionally, specify a PHP version to install. Default: 8.2.'
+        type: string
+        required: false
+        default: '8.2'
+    secrets:
+      ACLI_CLIENT_ID:
+        description: 'The client ID for authenticating with ACLI.'
+        required: true
+      ACLI_CLIENT_SECRET:
+        description: 'The client secret for authenticating with ACLI.'
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  backup-databases:
+    name: 'Backup Acquia databases'
+    runs-on: ubuntu-latest
+    outputs:
+      databases: ${{ steps.get_databases.outputs.databases }}
+    steps:
+      - name: Installing PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: ${{ inputs.php_version }}
+
+      - name: Installing dependencies
+        # JQ allows us to filter out results from the ACLI command.
+        run: |
+          curl -OL https://github.com/acquia/cli/releases/2.13.0/download/acli.phar
+          chmod +x acli.phar
+          echo "ACLI downloaded!"
+          sudo apt-get install -y jq
+          echo "JQ installed!"
+
+      - name: Authorizing with ACLI
+        id: acli_auth
+        run: |
+          acli auth:login -n \
+            --key=${{ secrets.ACLI_CLIENT_ID }} \
+            --secret=${{ secrets.ACLI_CLIENT_SECRET }}
+
+      - name: Retrieving all database names for this environment
+        id: get_databases
+        # Gets databases filtering by a name. If no filter is provided, it'll
+        # retrieve all databases.
+        run: |
+          acli api:environments:database-list \
+            --filter="${{ inputs.filter }}" \
+            ${{ inputs.environment_id }} \
+            | jq '.[] | .name' >> $GITHUB_OUPUT
+
+      - name: Backing up databases
+        run: |
+          while read database; do \
+            acli api:environments:database-backup-create ${{ inputs.environment_id }} $database \
+              && echo "💧 Successfully backed up database $database!" \
+              || echo "❌ Error backing up database $database. See logs." \
+          done <${{ steps.get_databases.outputs.databases }}
