@@ -61,7 +61,7 @@ jobs:
           php acli.phar api:environments:database-list \
             --filter="${{ inputs.filter }}" \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name' >> $GITHUB_OUPUT
+            | jq '.[] | .name' >> "$GITHUB_OUPUT"
 
       - name: Backing up databases
         run: |
