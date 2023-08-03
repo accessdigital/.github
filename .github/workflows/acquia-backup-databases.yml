@@ -50,8 +50,8 @@ jobs:
       - name: Authorizing with ACLI
         run: |
           php acli.phar auth:login -n \
-            --key=${{ secrets.ACLI_CLIENT_ID }} \
-            --secret=${{ secrets.ACLI_CLIENT_SECRET }}
+            --key="${{ secrets.ACLI_CLIENT_ID }}" \
+            --secret="${{ secrets.ACLI_CLIENT_SECRET }}"
 
       - name: Retrieving all database names for this environment
         id: get_databases
