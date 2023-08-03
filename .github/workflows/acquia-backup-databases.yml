@@ -32,7 +32,7 @@ jobs:
     name: 'Backup Acquia databases'
     runs-on: ubuntu-latest
     outputs:
-      databases: ${{ steps.get_databases.outputs.databases }}
+      databases: ${{ steps.get_databases.outputs.database_list }}
     steps:
       - name: Checking out code
         uses: actions/checkout@v3
@@ -58,10 +58,10 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
-          php acli.phar api:environments:database-list \
-            --filter="${{ inputs.filter }}" \
+          echo "database_list=$(php acli.phar api:environments:database-list \
+            --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name' >> "$GITHUB_OUTPUT"
+            | jq '.[] | .name')" >> "$GITHUB_OUTPUT"
 
       - name: Backing up databases
         run: |
