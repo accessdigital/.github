@@ -43,13 +43,12 @@ jobs:
         run: |
           curl -OL https://github.com/acquia/cli/releases/2.13.0/download/acli.phar
           chmod +x acli.phar
-          mv acli.phar /usr/local/bin/acli
           echo "ACLI downloaded!"
 
       - name: Authorizing with ACLI
         id: acli_auth
         run: |
-          acli auth:login -n \
+          acli.phar auth:login -n \
             --key=${{ secrets.ACLI_CLIENT_ID }} \
             --secret=${{ secrets.ACLI_CLIENT_SECRET }}
 
@@ -58,7 +57,7 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
-          acli api:environments:database-list \
+          acli.phar api:environments:database-list \
             --filter="${{ inputs.filter }}" \
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name' >> $GITHUB_OUPUT
@@ -66,7 +65,7 @@ jobs:
       - name: Backing up databases
         run: |
           while read database; do \
-            acli api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database \
+            acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database \
               && echo "💧 Successfully backed up database $database!" \
               || echo "❌ Error backing up database $database. See logs."; exit 1 \
           done <${{ steps.get_databases.outputs.databases }}
