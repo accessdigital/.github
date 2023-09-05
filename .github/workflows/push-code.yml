@@ -94,7 +94,6 @@ jobs:
           git fetch artefact
 
       - name: Ensure we have an un-shallow fetch.
-        if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
         # At some replace this with trying to build on top of the parent when
