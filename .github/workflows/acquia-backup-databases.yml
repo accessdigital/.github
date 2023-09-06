@@ -87,16 +87,15 @@ jobs:
           echo ${{ steps.get_databases.outputs.db-list }}
           echo "DB import end"
 
-          # Set space as the delimiter
-          IFS=' '
-
-          #Read the split words into an array based on space delimiter
-          read -a strarr <<< ${{ steps.get_databases.outputs.db-list }}
-
-          for val in "${strarr[@]}"; do
-            php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $val && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1
+          db_array=(${{ steps.get_databases.outputs.db-list }})
+          i=0
+          len=${#db_array[@]}
+          while [ $i -lt $len ];
+          do
+              echo ${db_array[$i]}
+              let i++
           done
 
           # while read database; do \
           #   php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1 \
-          # done <(split ${{ steps.get_databases.outputs.db-list }} by space)
+          # done < (split ${{ steps.get_databases.outputs.db-list }} by space)
