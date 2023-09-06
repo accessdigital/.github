@@ -87,12 +87,21 @@ jobs:
           echo ${{ steps.get_databases.outputs.db-list }}
           echo "DB import end"
 
-
           IFS=', ' read -r -a array <<< "${{ steps.get_databases.outputs.db-list }}"
           echo "Item 1"
           echo "${array[0]}"
           echo "Item 2"
           echo "${array[1]}"
+
+          i=0
+          len=${#array[@]}
+          while [ $i -lt $len ];
+          do
+              echo ${array[$i]}
+              echo ".."
+              let i++
+          done
+
 
           # while read db_list; do \
           #   php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $db_list && echo "💧 Successfully backed up database $db_list!" || echo "❌ Error backing up database $db_list. See logs."; exit 1 \
