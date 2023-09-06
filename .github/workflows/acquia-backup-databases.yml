@@ -83,22 +83,17 @@ jobs:
 
       - name: Backing up databases
         run: |
-          echo "DB import start"
-          echo ${{ steps.get_databases.outputs.db-list }}
-          echo "DB import end"
 
-          IFS=', ' read -r -a array <<< "${{ steps.get_databases.outputs.db-list }}"
-          echo "Item 1"
-          echo "${array[0]}"
-          echo "Item 2"
-          echo "${array[1]}"
+          # Split db-list into an array.
+          IFS=', ' read -r -a db_array <<< "${{ steps.get_databases.outputs.db-list }}"
 
+          # Loop through the array.
           i=0
-          while [ $i -lt ${#array[@]} ]
+          while [ $i -lt ${#db_array[@]} ]
           do
-            php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} ${array[$i]} && echo "💧 Successfully backed up database ${array[$i]}!" || echo "❌ Error backing up database ${array[$i]}. See logs."; exit 1 \
-            echo "${array[$i]}"
-            echo ".."
+            # php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} ${array[$i]} && echo "💧 Successfully backed up database ${array[$i]}!" || echo "❌ Error backing up database ${array[$i]}. See logs."; exit 1 \
+            echo "${db_array[$i]}"
+            echo "."
             i=$((i + 1))
           done
 
