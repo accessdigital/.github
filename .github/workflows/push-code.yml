@@ -126,6 +126,9 @@ jobs:
           branch=${rawbranch/origin\/}
           git reset --soft artefact/${branch}-build || true
 
+      - name: Remove nested git directories.
+        run: find . -mindepth 2 -type d -name .git | xargs rm -rf
+
       - name: Add the default build files.
         if: inputs.add_files_defaults
         run: git add -f vendor/ docroot/.htaccess docroot/index.php docroot/autoload.php docroot/robots.txt docroot/*/
