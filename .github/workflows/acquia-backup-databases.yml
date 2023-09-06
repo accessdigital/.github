@@ -70,10 +70,10 @@ jobs:
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name')"
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "text<<$EOF" >> $GITHUB_OUTPUT
+          delimiter="$(openssl rand -hex 8)"
+          echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
       - name: Backing up databases
         run: |
