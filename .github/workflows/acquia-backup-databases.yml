@@ -58,10 +58,10 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
-          php acli.phar api:environments:database-list \
+          database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
-            ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name'
+            ${{ secrets.ENVIRONMENT_ID }}
+          echo ${database_list}
 
       - name: Backing up databases
         run: |
