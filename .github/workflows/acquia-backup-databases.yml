@@ -65,7 +65,6 @@ jobs:
 
       - name: Backing up databases
         run: |
-          echo $database_list
           while read database; do \
             php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1 \
           done <${{ steps.get_databases.outputs.databases }}
