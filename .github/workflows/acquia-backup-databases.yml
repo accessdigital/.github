@@ -87,6 +87,14 @@ jobs:
           echo ${{ steps.get_databases.outputs.db-list }}
           echo "DB import end"
 
+          while read db_listing; do \
+            echo "DB" \
+          done <${{ steps.get_databases.outputs.db-list }}
+
+          echo "DB import 2 start"
+          echo db_list
+          echo "DB import 2 end"
+
           while read database; do \
             php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1 \
           done <${{ steps.get_databases.outputs.databases }}
