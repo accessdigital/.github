@@ -73,7 +73,7 @@ jobs:
             | jq '.[] | .name')
 
           delimiter="$(openssl rand -hex 8)"
-          echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "db-list<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> ${GITHUB_OUTPUT}
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
@@ -83,9 +83,7 @@ jobs:
       - name: Backing up databases
         run: |
           echo "DB import start"
-          echo ${{ steps.get_databases.outputs.c_test }}
-          echo ${{ steps.get_databases.outputs.output-name }}
-          echo database
+          echo ${{ steps.get_databases.outputs.db-list }}
           echo "DB import end"
 
           while read database; do \
