@@ -136,11 +136,11 @@ jobs:
 
       - name: Remove the default exclusions.
         if: inputs.remove_files_defaults
-        run: git rm --ignore-unmatch .ddev/ .github/ patches/ docroot/core/install.php docroot/core/update.php docroot/core/rebuild.php
+        run: git rm --ignore-unmatch -r .ddev/ .github/ patches/ docroot/core/install.php docroot/core/update.php docroot/core/rebuild.php
 
       - name: Remove the additional exclusion.
         if: inputs.remove_files != ''
-        run: git rm --ignore-unmatch ${{ inputs.remove_files }}
+        run: git rm --ignore-unmatch -r ${{ inputs.remove_files }}
 
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
