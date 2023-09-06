@@ -60,6 +60,7 @@ jobs:
         run: |
           database_pre_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
+            --limit='5' \
             ${{ secrets.ENVIRONMENT_ID }})
           echo "DB list start"
           echo ${database_pre_list}
@@ -68,7 +69,9 @@ jobs:
           echo "database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name')" >> "$GITHUB_OUTPUT"
+            | jq '.[] | .name')"
+          echo 'var<<EOF' >> $GITHUB_OUTPUT
+          echo ${database_list} >> $GITHUB_OUTPUT
 
       - name: Backing up databases
         run: |
