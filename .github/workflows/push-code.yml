@@ -21,6 +21,17 @@ on:
       add_files:
         description: 'The files/directories to add, bypassing .gitignore'
         type: string
+      add_files_defaults:
+        description: 'Add the default set of files'
+        type: boolean
+        default: true
+      remove_files:
+        description: 'The files/directories to remove from deployment'
+        type: string
+      remove_files_defaults:
+        description: 'Remove the default set of files'
+        type: boolean
+        default: true
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
@@ -90,25 +101,49 @@ jobs:
 
       - name: Add & fetch the artefact repo.
         run: |
-          git config --global --add safe.directory $(realpath .)
           git remote add artefact ${{ secrets.ARTEFACT_REPO }}
           git fetch artefact
 
-      - name: Checkout artefact branch without changing local files.
-        if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
+      - name: Ensure we have an un-shallow fetch.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-        # Include an unshallow fetch of origin so that we have history. At some
-        # replace this with trying to build on top of the parent when there
-        # isn't a previous build in the same branch.
+        # At some replace this with trying to build on top of the parent when
+        # there isn't a previous build in the same branch.
         run: |
           git remote set-url origin $(git remote get-url origin | sed 's#https://#https://${{ secrets.GITHUB_TOKEN }}:${{ secrets.GITHUB_TOKEN }}@#')
           git fetch --unshallow origin
+
+      - name: Checkout artefact branch without changing local files.
+        if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
+        run: |
           git checkout -b ${COMMIT_REF:11}-build
           git reset --soft artefact/${COMMIT_REF:11}-build || true
 
-      - name: Add the build files.
+      - name: Checkout tag's artefact branch without changing local files.
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          rawbranch=$(git branch -r --contains ${COMMIT_REF:10} | grep -Eo 'origin/[^ ]+$' | head -n 1)
+          branch=${rawbranch/origin\/}
+          git reset --soft artefact/${branch}-build || true
+
+      - name: Remove nested git directories.
+        run: find . -mindepth 2 -type d -name .git | xargs rm -rf
+
+      - name: Add the default build files.
+        if: inputs.add_files_defaults
+        run: git add -f vendor/ docroot/.htaccess docroot/index.php docroot/autoload.php docroot/robots.txt docroot/*/
+
+      - name: Add the additional build files.
+        if: inputs.add_files != ''
         run: git add -f ${{ inputs.add_files }}
+
+      - name: Remove the default exclusions.
+        if: inputs.remove_files_defaults
+        run: git rm --ignore-unmatch -rf .ddev/ .github/ patches/ docroot/core/install.php docroot/core/update.php docroot/core/rebuild.php
+
+      - name: Remove the additional exclusion.
+        if: inputs.remove_files != ''
+        run: git rm --ignore-unmatch -rf ${{ inputs.remove_files }}
 
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
