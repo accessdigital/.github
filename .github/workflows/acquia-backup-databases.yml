@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       databases: ${{ steps.get_databases.outputs.database_list }}
+      db_list: ${{ steps.get_databases.outputs.db-list }}
     steps:
       - name: Checking out code
         uses: actions/checkout@v3
@@ -82,10 +83,8 @@ jobs:
 
       - name: Backing up databases
         run: |
-
-          dbs=${{ steps.get_databases.outputs.db-list }}
           echo "DB import start"
-          echo ${dbs}
+          echo ${{ steps.get_databases.outputs.db-list }}
           echo "DB import end"
 
           while read database; do \
