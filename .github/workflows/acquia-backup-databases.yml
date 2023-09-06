@@ -85,7 +85,7 @@ jobs:
 
           dbs=${{ steps.get_databases.outputs.db-list }}
           echo "DB import start"
-          echo $dbs
+          echo ${dbs}
           echo "DB import end"
 
           while read database; do \
