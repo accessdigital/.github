@@ -93,9 +93,8 @@ jobs:
           #Read the split words into an array based on space delimiter
           read -a strarr <<< ${{ steps.get_databases.outputs.db-list }}
 
-          for val in "${strarr[@]}";
-          do
-            printf "$val\n"
+          for val in "${strarr[@]}"; do
+            php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $val && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1
           done
 
           # while read database; do \
