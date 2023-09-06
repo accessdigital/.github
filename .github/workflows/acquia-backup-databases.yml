@@ -81,7 +81,7 @@ jobs:
         run: |
           echo "DB import start"
           echo ${{ steps.get_databases.outputs.c_test }}
-          echo ${database_list}
+          echo ${{ steps.get_databases.outputs.database_list }}
           echo "DB import end"
           echo $database_list
           while read database; do \
