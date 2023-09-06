@@ -58,33 +58,27 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
-          database_pre_list=$(php acli.phar api:environments:database-list \
+          acsf_request=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
-            --limit='5' \
+            --limit='1' \
             ${{ secrets.ENVIRONMENT_ID }})
+
           echo "DB list start"
-          echo ${database_pre_list}
+          echo ${acsf_request}
           echo "DB list end"
 
           database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq -r '.[] | .name')
-          delimiter="$(openssl rand -hex 8)"
-          echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          echo ${database_list} >> ${GITHUB_OUTPUT}
-          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-          c_test="Hello world"
-          echo "c_test=$c_test" >> $GITHUB_OUTPUT
-          echo "database_list_2=$database_list" >> $GITHUB_OUTPUT
+            | jq '.[] | .name')
 
       - name: Backing up databases
         run: |
           echo "DB import start"
           echo ${{ steps.get_databases.outputs.c_test }}
-          echo ${{ steps.get_databases.outputs.database_list_2 }}
+          echo database
           echo "DB import end"
-          echo $database_list
+
           while read database; do \
             php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $database && echo "💧 Successfully backed up database $database!" || echo "❌ Error backing up database $database. See logs."; exit 1 \
           done <${{ steps.get_databases.outputs.databases }}
