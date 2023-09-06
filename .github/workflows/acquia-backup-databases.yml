@@ -66,22 +66,22 @@ jobs:
           echo ${database_pre_list}
           echo "DB list end"
 
-          database_list=$(php acli.phar api:environments:database-list \
+          echo "database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name')
-
+            | jq '.[] | .name')"
           delimiter="$(openssl rand -hex 8)"
           echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> ${GITHUB_OUTPUT}
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-
-          echo "database_list=$database_list" >> $GITHUB_OUTPUT
+          c_test="Hello world"
+          echo "c_test=$c_test" >> $GITHUB_OUTPUT
 
       - name: Backing up databases
         run: |
           echo "DB import start"
-          echo ${{ steps.get_databases.outputs.database_list }}
+          echo ${{ steps.get_databases.outputs.c_test }}
+          echo ${database_list}
           echo "DB import end"
           echo $database_list
           while read database; do \
