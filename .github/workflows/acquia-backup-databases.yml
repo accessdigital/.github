@@ -66,10 +66,10 @@ jobs:
           echo ${database_pre_list}
           echo "DB list end"
 
-          echo "database_list=$(php acli.phar api:environments:database-list \
+          database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
-            | jq '.[] | .name')"
+            | jq '.[] | .name')
           delimiter="$(openssl rand -hex 8)"
           echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> ${GITHUB_OUTPUT}
