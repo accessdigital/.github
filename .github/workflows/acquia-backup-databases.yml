@@ -78,7 +78,7 @@ jobs:
       - name: Backing up databases
         run: |
           echo "DB import start"
-          echo $GITHUB_OUTPUT['database_list']
+          echo ${{ steps.get_databases.outputs.databases }}
           echo "DB import end"
           echo $database_list
           while read database; do \
