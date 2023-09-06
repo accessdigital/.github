@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       databases: ${{ steps.get_databases.outputs.database_list }}
-      db_list: ${{ steps.get_databases.outputs.db-list }}
+      db_list: ${{ steps.get_databases.outputs.db_list }}
     steps:
       - name: Checking out code
         uses: actions/checkout@v3
@@ -59,44 +59,40 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
+          # The first time we run api:environments:database-list acli very
+          # kindly also outputs a string asking the user to share
+          # anonymous user data along with the JSON output causing error
+          # further down the chain - this simply mitigates that.
           acsf_request=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             --limit='1' \
             ${{ secrets.ENVIRONMENT_ID }})
 
-          echo "DB list start"
-          echo ${acsf_request}
-          echo "DB list end"
-
+          # Gets a list of databases and uses jq to filter the output
+          # to the name value only.
           database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name')
 
+          # Processes the output of databases.
           delimiter="$(openssl rand -hex 8)"
-          echo "db-list<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "db_list<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> ${GITHUB_OUTPUT}
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-
-          c_test="Hello world"
-          echo "c_test=$c_test" >> $GITHUB_OUTPUT
 
       - name: Backing up databases
         run: |
 
-          # Split db-list into an array.
-          IFS=', ' read -r -a db_array <<< "${{ steps.get_databases.outputs.db-list }}"
+          # Split db_list into an array.
+          IFS=', ' read -r -a db_array <<< "${{ steps.get_databases.outputs.db_list }}"
 
-          # Loop through the array.
+          # Loop through the array of databases and attempt to 
+          # perform a backup for each database.
           i=0
           while [ $i -lt ${#db_array[@]} ]
           do
             php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} ${db_array[$i]}
-            echo "${db_array[$i]}"
+            echo "💧 Successfully backed up database "${db_array[$i]}"" || echo "❌ Error backing up database $db_list. See logs."
             i=$((i + 1))
           done
-
-
-          # while read db_list; do \
-          #   php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} $db_list && echo "💧 Successfully backed up database $db_list!" || echo "❌ Error backing up database $db_list. See logs."; exit 1 \
-          # done <${{ steps.get_databases.outputs.db-list }}
