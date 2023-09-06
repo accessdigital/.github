@@ -21,6 +21,17 @@ on:
       add_files:
         description: 'The files/directories to add, bypassing .gitignore'
         type: string
+      add_files_defaults:
+        description: 'Add the default set of files'
+        type: boolean
+        default: true
+      remove_files:
+        description: 'The files/directories to remove from deployment'
+        type: string
+      remove_files_defaults:
+        description: 'Remove the default set of files'
+        type: boolean
+        default: true
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
@@ -115,8 +126,21 @@ jobs:
           branch=${rawbranch/origin\/}
           git reset --soft artefact/${branch}-build || true
 
-      - name: Add the build files.
+      - name: Add the default build files.
+        if: inputs.add_files_defaults
+        run: git add -f vendor/ docroot/.htaccess docroot/index.php docroot/autoload.php docroot/robots.txt docroot/*/
+
+      - name: Add the additional build files.
+        if: inputs.add_files != ''
         run: git add -f ${{ inputs.add_files }}
+
+      - name: Remove the default exclusions.
+        if: inputs.remove_files_defaults
+        run: git rm --ignore-unmatch -rf .ddev/ .github/ patches/ docroot/core/install.php docroot/core/update.php docroot/core/rebuild.php
+
+      - name: Remove the additional exclusion.
+        if: inputs.remove_files != ''
+        run: git rm --ignore-unmatch -rf ${{ inputs.remove_files }}
 
       - name: Deploy the artifact for branches/pulls
         if: startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/pull/')
