@@ -70,7 +70,8 @@ jobs:
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name')"
-          echo "<<$EOF" >> $GITHUB_OUTPUT
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "text<<$EOF" >> $GITHUB_OUTPUT
           echo ${database_list} >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
