@@ -61,7 +61,9 @@ jobs:
           database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }})
+          echo "DB list start"
           echo ${database_list}
+          echo "DB list end"
 
       - name: Backing up databases
         run: |
