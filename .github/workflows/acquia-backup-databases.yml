@@ -82,8 +82,10 @@ jobs:
 
       - name: Backing up databases
         run: |
+
+          dbs=${{ steps.get_databases.outputs.db-list }}
           echo "DB import start"
-          echo ${{ steps.get_databases.outputs.db-list }}
+          echo $dbs
           echo "DB import end"
 
           while read database; do \
