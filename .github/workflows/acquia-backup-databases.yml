@@ -96,10 +96,10 @@ jobs:
           i=0
           len=${#array[@]}
           while [ $i -lt $len ];
-          do
-              echo ${array[$i]}
-              echo ".."
-              let i++
+          do \
+              echo ${array[$i]} \
+              echo ".." \
+              let i++ \
           done
 
 
