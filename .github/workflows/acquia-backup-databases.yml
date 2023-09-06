@@ -96,6 +96,7 @@ jobs:
           i=0
           while [ $i -lt ${#array[@]} ]
           do
+            php acli.phar api:environments:database-backup-create ${{ secrets.ENVIRONMENT_ID }} ${array[$i]} && echo "💧 Successfully backed up database ${array[$i]}!" || echo "❌ Error backing up database ${array[$i]}. See logs."; exit 1 \
             echo "${array[$i]}"
             echo ".."
             i=$((i + 1))
