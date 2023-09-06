@@ -60,7 +60,7 @@ jobs:
         run: |
           database_list=$(php acli.phar api:environments:database-list \
             --filter='${{ inputs.filter }}' \
-            ${{ secrets.ENVIRONMENT_ID }}
+            ${{ secrets.ENVIRONMENT_ID }})
           echo ${database_list}
 
       - name: Backing up databases
