@@ -72,6 +72,14 @@ jobs:
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq '.[] | .name')
 
+          delimiter="$(openssl rand -hex 8)"
+          echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo ${database_list} >> ${GITHUB_OUTPUT}
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+          c_test="Hello world"
+          echo "c_test=$c_test" >> $GITHUB_OUTPUT
+
       - name: Backing up databases
         run: |
           echo "DB import start"
