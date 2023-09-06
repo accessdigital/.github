@@ -62,7 +62,7 @@ jobs:
             --filter='${{ inputs.filter }}' \
             ${{ secrets.ENVIRONMENT_ID }} \
             | jq -r '.[] | .name')
-          echo ${database_list}
+          echo $database_list
 
       - name: Backing up databases
         run: |
