@@ -59,14 +59,8 @@ jobs:
         # Gets databases filtering by a name. If no filter is provided, it'll
         # retrieve all databases.
         run: |
-          # The first time we run api:environments:database-list acli very
-          # kindly also outputs a string asking the user to share
-          # anonymous user data along with the JSON output causing an error
-          # further down the chain - this simply mitigates that.
-          acsf_request=$(php acli.phar api:environments:database-list \
-            --filter='${{ inputs.filter }}' \
-            --limit='1' \
-            ${{ secrets.ENVIRONMENT_ID }})
+          # Disable ACLI telemetry
+          disable_acli_telemetry=$(php acli.phar self:telemetry:disable)
 
           # Gets a list of databases and uses jq to filter the output
           # to the name value only.
