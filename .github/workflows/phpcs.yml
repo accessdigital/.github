@@ -1,4 +1,5 @@
-name: PHP Coding Standards
+name: PHP Coding Standards (deprecated)
+# Deprecated in favour of php-analysis.yml.
 
 on:
   workflow_call:
@@ -22,7 +23,7 @@ defaults:
 
 jobs:
   phpcs:
-    name: 'PHP Coding Standards'
+    name: 'PHP Coding Standards (deprecated)'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     steps:
