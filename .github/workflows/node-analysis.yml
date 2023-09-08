@@ -1,0 +1,100 @@
+name: Node Analysis
+
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: 'The directory to run in'
+        type: string
+        default: './'
+      container:
+        description: 'The docker image to use'
+        type: string
+        required: true
+      source_key:
+        description: 'The source cache key suffix'
+        type: string
+        default: 'npm'
+      audit:
+        description: 'Run npm audit'
+        type: boolean
+        default: true
+      lint:
+        description: 'The lint script name, or empty to disable'
+        type: string
+        default: 'lint'
+      test:
+        description: 'The test script name, or empty to disable'
+        type: string
+        default: 'test'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  audit:
+    name: 'NPM audit'
+    if: inputs.audit
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Run npm audit.
+        run: |
+          npm --prefix frontend audit
+
+  lint:
+    name: 'Lint'
+    if: inputs.lint != ''
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Run npm lint.
+        run: |
+          npm --prefix frontend run lint
+
+  test:
+    name: 'Test'
+    if: inputs.test != ''
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Run npm test.
+        run: |
+          npm --prefix frontend run test
