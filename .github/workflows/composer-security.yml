@@ -16,12 +16,13 @@ on:
         type: string
         default: 'composer'
 
+
 defaults:
   run:
     shell: bash
 
 jobs:
-  phpcs:
+  composer-security:
     name: 'Composer security'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
