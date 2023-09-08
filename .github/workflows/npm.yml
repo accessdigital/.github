@@ -18,6 +18,10 @@ on:
         description: 'The target cache key suffix, or empty to throw away'
         type: string
         default: 'npm'
+      target_path:
+        description: 'The target path for the cache'
+        type: string
+        default: './*'
       ssh_config:
         description: 'Indicate we need to run SSH configuration for asset access'
         type: boolean
@@ -61,7 +65,7 @@ jobs:
         uses: actions/cache@v3
         id: target-build
         with:
-          path: ./*
+          path: ${{ inputs.target_path }}
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.target_key }}
 
