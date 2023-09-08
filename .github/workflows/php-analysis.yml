@@ -77,4 +77,4 @@ jobs:
       - name: Run Drupal Check.
         run: |
           cd ${{ inputs.directory }}
-          ./vendor/bin/drupal-check -ad ${{ inputs.drupal_check }}
+          ./vendor/bin/drupal-check -${{ inputs.drupal_check_level }} ${{ inputs.drupal_check }}
