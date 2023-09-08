@@ -20,9 +20,9 @@ on:
         type: boolean
         default: true
       drupal_check:
-        description: 'Run Drupal Check'
-        type: boolean
-        default: true
+        description: 'Directories for the Drupal Check scan, or empty to disable'
+        type: string
+        default: ''
 
 defaults:
   run:
@@ -54,7 +54,7 @@ jobs:
 
   drupal-check:
     name: 'Drupal Check Analysis'
-    if: inputs.drupal_check
+    if: inputs.drupal_check != ''
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     steps:
@@ -73,4 +73,4 @@ jobs:
       - name: Run Drupal Check.
         run: |
           cd ${{ inputs.directory }}
-          ./vendor/bin/drupal-check -ad ./docroot/profiles/custom ./docroot/modules/custom ./docroot/themes/custom
+          ./vendor/bin/drupal-check -ad ${{ inputs.drupal_check }}
