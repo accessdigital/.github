@@ -7,6 +7,14 @@ on:
         description: 'The target branch'
         type: string
         required: false
+    git_name:
+      description: 'The git committer name'
+      type: string
+      required: true
+    git_email:
+      description: 'The git committer email'
+      type: string
+      required: true
 
 defaults:
   run:
@@ -46,12 +54,20 @@ jobs:
         env:
           GITHUB_REF: ${{ github.ref }}
           GITHUB_SHA: ${{ github.sha }}
+          GIT_AUTHOR_NAME: ${{ inputs.git_name }}
+          GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
+          GIT_COMMITTER_NAME: ${{ inputs.git_name }}
+          GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
         run: git commit -m "Deploy ${GITHUB_REF:11} [${GITHUB_SHA:0:7}]" --allow-empty
 
       - name: Commit the changes if ref is a tag
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_REF: ${{ github.ref }}
+          GIT_AUTHOR_NAME: ${{ inputs.git_name }}
+          GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
+          GIT_COMMITTER_NAME: ${{ inputs.git_name }}
+          GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
         run: git commit -m "Release ${GITHUB_REF:10}" --allow-empty
 
       - name: Push the changes
