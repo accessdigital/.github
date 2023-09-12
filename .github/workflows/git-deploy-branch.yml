@@ -52,6 +52,7 @@ jobs:
         run: |
           git config --global --add safe.directory $(realpath .) && echo 'config'
           git diff && echo 'diff'
+          git diff-index HEAD && echo 'diff-index loud'
           git diff-index --quiet HEAD && echo 'diff-index'
 
       - name: Commit the changes if ref is a branch
