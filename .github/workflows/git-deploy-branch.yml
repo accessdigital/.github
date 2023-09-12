@@ -1,0 +1,58 @@
+name: Deploy via a git branch
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'The target branch'
+        type: string
+        required: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  push-code:
+    name: 'Push branch to repo'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Checkout the target branch, creating if necessary
+        run: git checkout ${{ inputs.branch }} || git checkout -b ${{ inputs.branch }}
+
+      - name: Update the code to the ref we are deploying
+        # Checkout of a target branch will only check out changes within that
+        # branch, which means removed files don't get removed. We handle that
+        # with a check and remove. We also use the sha specifically to avoid
+        # a subsequent push on a branch resulting in a different commit than
+        # intended.
+        run: |
+          git checkout ${{ github.sha }} -- .
+          git diff ${{ github.sha }} --name-only | xargs -r git rm
+
+      - name: Ensure everything matches before proceeding
+        run: |
+          git config --global --add safe.directory $(realpath .)
+          git diff ${{ inputs.directory }}
+          git diff-index --quiet HEAD -- ${{ inputs.directory }}
+
+      - name: Commit the changes if ref is a branch
+        if: startsWith(github.ref, 'refs/heads/')
+        env:
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: git commit -m "Deploy ${GITHUB_REF:11} [${GITHUB_SHA:0:7}]" --allow-empty
+
+      - name: Commit the changes if ref is a tag
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: git commit -m "Release ${GITHUB_REF:10}" --allow-empty
+
+      - name: Push the changes
+        run: git push
