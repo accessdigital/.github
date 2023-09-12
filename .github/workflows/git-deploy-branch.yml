@@ -7,14 +7,14 @@ on:
         description: 'The target branch'
         type: string
         required: false
-    git_name:
-      description: 'The git committer name'
-      type: string
-      required: true
-    git_email:
-      description: 'The git committer email'
-      type: string
-      required: true
+      git_name:
+        description: 'The git committer name'
+        type: string
+        required: true
+      git_email:
+        description: 'The git committer email'
+        type: string
+        required: true
 
 defaults:
   run:
