@@ -71,4 +71,4 @@ jobs:
         run: git commit -m "Release ${GITHUB_REF:10}" --allow-empty
 
       - name: Push the changes
-        run: git push
+        run: git push origin ${{ inputs.branch }}
