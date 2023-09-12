@@ -50,10 +50,9 @@ jobs:
 
       - name: Ensure everything matches before proceeding
         run: |
-          git config --global --add safe.directory $(realpath .) && echo 'config'
-          git diff && echo 'diff'
-          git diff-index HEAD && echo 'diff-index loud'
-          git diff-index --quiet HEAD && echo 'diff-index'
+          git config --global --add safe.directory $(realpath .)
+          git diff ${{ github.sha }}
+          git diff-index --quiet ${{ github.sha }}
 
       - name: Commit the changes if ref is a branch
         if: startsWith(github.ref, 'refs/heads/')
