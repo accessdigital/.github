@@ -18,7 +18,19 @@ on:
     secrets:
       GIT_ACCESS_TOKEN:
         description: 'The write access token for the git repo.'
-        required: true
+        required: false
+      TARGET_REPO:
+        description: 'URL of the target repo.'
+        required: false
+      TARGET_SSH_KEY:
+        description: 'Private SSH key authorised to push to the target repo'
+        required: false
+      SSH_CONFIG:
+        description: 'SSH configuration'
+        required: false
+      KNOWN_HOSTS:
+        description: 'SSH known hosts'
+        required: false
 
 defaults:
   run:
@@ -29,11 +41,18 @@ jobs:
     name: 'Push branch to repo'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the code
+      - name: Check out the code with a token
         uses: actions/checkout@v3
+        if: secrets.GIT_ACCESS_TOKEN
         with:
           fetch-depth: 0
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+      - name: Check out the code without a token
+        uses: actions/checkout@v3
+        if: ! secrets.GIT_ACCESS_TOKEN
+        with:
+          fetch-depth: 0
 
       - name: Checkout the target branch, creating if necessary
         run: git checkout ${{ inputs.branch }} || git checkout -b ${{ inputs.branch }}
@@ -75,5 +94,22 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ inputs.git_email }}
         run: git commit -m "Release ${GITHUB_REF:10}" --allow-empty
 
-      - name: Push the changes
+      - name: Push the branch to github
+        if: ! secrets.TARGET_REPO
         run: git push origin ${{ inputs.branch }}
+
+      - name: Set up the SSH key and configuration
+        if: secrets.TARGET_REPO
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.TARGET_SSH_KEY }}
+          config: ${{ secrets.SSH_CONFIG }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Add the git remote
+        if: secrets.TARGET_REPO
+        run: git remote add target ${{ secrets.TARGET_REPO }}
+
+      - name: Push the branch to a remote
+        if: secrets.TARGET_REPO
+        run: git push target ${{ inputs.branch }}
