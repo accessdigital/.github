@@ -10,7 +10,6 @@ on:
       remote_repo:
         description: 'Whether to push to a remote repo'
         type: boolean
-        required: true
         default: false
       git_name:
         description: 'The git committer name'
