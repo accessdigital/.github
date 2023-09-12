@@ -50,7 +50,7 @@ jobs:
 
       - name: Check out the code without a token
         uses: actions/checkout@v3
-        if: !secrets.GIT_ACCESS_TOKEN
+        if: secrets.GIT_ACCESS_TOKEN == null
         with:
           fetch-depth: 0
 
@@ -95,7 +95,7 @@ jobs:
         run: git commit -m "Release ${GITHUB_REF:10}" --allow-empty
 
       - name: Push the branch to github
-        if: !secrets.TARGET_REPO
+        if: secrets.TARGET_REPO == null
         run: git push origin ${{ inputs.branch }}
 
       - name: Set up the SSH key and configuration
