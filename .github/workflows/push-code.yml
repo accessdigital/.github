@@ -93,7 +93,7 @@ jobs:
 
       - name: Run the composer install to remove dev dependencies.
         if: inputs.composer_directory != ''
-        run: composer -d "${{ inputs.directory }}" install --no-dev --no-progress ${{ inputs.composer_options }}
+        run: composer -d "${{ inputs.composer_directory }}" install --no-dev --no-progress ${{ inputs.composer_options }}
 
       - name: Get commit details for pull requests.
         if: startsWith(github.ref, 'refs/pull/')
