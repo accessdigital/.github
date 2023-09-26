@@ -25,7 +25,7 @@ on:
       composer_options:
         description: 'Additional options to pass to composer'
         type: string
-        default: ''
+        default: '-o --apcu-autoloader'
     secrets:
       SSH_KEY:
         description: 'Private SSH key for any authenticated assets'

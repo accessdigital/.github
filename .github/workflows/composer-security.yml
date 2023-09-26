@@ -1,11 +1,10 @@
-name: PHP Coding Standards (deprecated)
-# Deprecated in favour of php-analysis.yml.
+name: Composer security checks.
 
 on:
   workflow_call:
     inputs:
       directory:
-        description: 'The directory to run in'
+        description: 'The directory in which to run commands'
         type: string
         default: './'
       container:
@@ -17,13 +16,14 @@ on:
         type: string
         default: 'composer'
 
+
 defaults:
   run:
     shell: bash
 
 jobs:
-  phpcs:
-    name: 'PHP Coding Standards (deprecated)'
+  composer-security:
+    name: 'Composer security'
     runs-on: ubuntu-latest
     container: ${{ inputs.container }}
     steps:
@@ -39,7 +39,6 @@ jobs:
         run: exit 1
         if: steps.restore-build.outputs.cache-hit != 'true'
 
-      - name: Run PHPCS.
+      - name: Run security checks.
         run: |
-          cd ${{ inputs.directory }}
-          ./vendor/bin/phpcs
+          composer update --dry-run roave/security-advisories

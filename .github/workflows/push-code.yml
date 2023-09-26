@@ -32,6 +32,14 @@ on:
         description: 'Remove the default set of files'
         type: boolean
         default: true
+      composer_directory:
+        description: 'The directory in which to run composer commands, or an empty string to disable'
+        type: string
+        default: './'
+      composer_options:
+        description: 'Additional options to pass to composer when removing dev dependencies'
+        type: string
+        default: '-o --apcu-autoloader'
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
@@ -83,6 +91,10 @@ jobs:
         run: exit 1
         if: steps.restore-build.outputs.cache-hit != 'true'
 
+      - name: Run the composer install to remove dev dependencies.
+        if: inputs.composer_directory != ''
+        run: composer -d "${{ inputs.composer_directory }}" install --no-dev --no-progress ${{ inputs.composer_options }}
+
       - name: Get commit details for pull requests.
         if: startsWith(github.ref, 'refs/pull/')
         env:
@@ -131,11 +143,11 @@ jobs:
 
       - name: Add the default build files.
         if: inputs.add_files_defaults
-        run: git add -f vendor/ docroot/.htaccess docroot/index.php docroot/autoload.php docroot/robots.txt docroot/*/
+        run: git add -Af vendor/ docroot/.htaccess docroot/index.php docroot/autoload.php docroot/robots.txt docroot/*/
 
       - name: Add the additional build files.
         if: inputs.add_files != ''
-        run: git add -f ${{ inputs.add_files }}
+        run: git add -Af ${{ inputs.add_files }}
 
       - name: Remove the default exclusions.
         if: inputs.remove_files_defaults
