@@ -37,16 +37,13 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
           path: ./*
+          fail-on-cache-miss: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
-
-      - name: Abort if we have a source build cache miss.
-        run: exit 1
-        if: steps.restore-build.outputs.cache-hit != 'true'
 
       - name: Start the PHP server.
         run: |
