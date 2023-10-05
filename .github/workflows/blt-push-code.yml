@@ -64,9 +64,15 @@ jobs:
         id: restore-build
         with:
           path: ./*
-          fail-on-cache-miss: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        # Only check if we have a source key.
+        if: |
+          inputs.source_key != '' &&
+          steps.restore-build.outputs.cache-hit != 'true'
 
       - name: Checkout the code.
         # Only if we do not have a source key.

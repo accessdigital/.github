@@ -68,10 +68,18 @@ jobs:
         id: restore-build
         with:
           path: ./*
-          fail-on-cache-miss: true
           enableCrossOsArchive: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        # Skip if we already have a full build.
+        # Only if we have a source key.
+        if: |
+          (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
+          inputs.source_key != '' &&
+          steps.restore-build.outputs.cache-hit != 'true'
 
       - name: Checkout the code.
         # Skip if we already have a full build.

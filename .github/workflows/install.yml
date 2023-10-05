@@ -44,9 +44,12 @@ jobs:
         id: restore-build
         with:
           path: ./*
-          fail-on-cache-miss: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
 
       - name: Run an install from existing config.
         run: ./vendor/bin/drush site:install --existing-config --db-url=mysql://db:db@db:3306/db
@@ -60,6 +63,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: ./db.sql.gz
+          enableCrossOsArchive: true
           key: build-${{ github.sha }}-${{ inputs.sql_target_key }}
 
       - name: Ensure config imported cleanly with no differences.
