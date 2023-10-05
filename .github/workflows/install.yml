@@ -53,7 +53,7 @@ jobs:
 
       - name: Create a SQL dump.
         if: inputs.sql_target_key != ''
-        run: ./vendor/bin/drush sql:dump --gzip --result-file db.sql.gz
+        run: ./vendor/bin/drush sql:dump --gzip --result-file ./db.sql.gz
 
       - name: Store the SQL dump.
         if: inputs.sql_target_key != ''
