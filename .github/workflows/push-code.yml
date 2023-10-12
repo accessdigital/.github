@@ -80,7 +80,7 @@ jobs:
         run: git config --global --add safe.directory '*'
 
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
           path: ./*

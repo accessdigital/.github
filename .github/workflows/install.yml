@@ -11,6 +11,10 @@ on:
         description: 'The source cache key suffix'
         type: string
         default: 'composer'
+      sql_target_key:
+        description: 'The target key for a SQL dump'
+        type: string
+        default: ''
 
 defaults:
   run:
@@ -36,7 +40,7 @@ jobs:
         run: git config --global --add safe.directory '*'
 
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
           path: ./*
@@ -49,6 +53,18 @@ jobs:
 
       - name: Run an install from existing config.
         run: ./vendor/bin/drush site:install --existing-config --db-url=mysql://db:db@db:3306/db
+
+      - name: Create a SQL dump.
+        if: inputs.sql_target_key != ''
+        run: ./vendor/bin/drush sql:dump --gzip --result-file "$(pwd)/db.sql"
+
+      - name: Store the SQL dump.
+        if: inputs.sql_target_key != ''
+        uses: actions/cache/save@v3
+        with:
+          path: ./db.sql.gz
+          enableCrossOsArchive: true
+          key: build-${{ github.sha }}-${{ inputs.sql_target_key }}
 
       - name: Ensure config imported cleanly with no differences.
         run: |

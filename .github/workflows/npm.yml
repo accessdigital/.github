@@ -66,6 +66,7 @@ jobs:
         id: target-build
         with:
           path: ${{ inputs.target_path }}
+          enableCrossOsArchive: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.target_key }}
 
@@ -75,7 +76,7 @@ jobs:
         if: |
           (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
           inputs.source_key != ''
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
           path: ./*
@@ -105,6 +106,7 @@ jobs:
           path: |
             ~/.npm
             ~/.nvm
+          enableCrossOsArchive: true
           # Save the cache with the hash of the lock files.
           key: npm-${{ hashFiles('**/package-lock.json') }}
           # If there is no direct hit, restore the latest npm-* cache. This will

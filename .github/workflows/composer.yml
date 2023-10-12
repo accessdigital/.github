@@ -54,6 +54,7 @@ jobs:
         id: target-build
         with:
           path: ./*
+          enableCrossOsArchive: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.target_key }}
 
@@ -67,6 +68,7 @@ jobs:
         id: restore-build
         with:
           path: ./*
+          enableCrossOsArchive: true
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
 
@@ -99,6 +101,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.ACTIONS_COMPOSER_CACHE_DIR }}
+          enableCrossOsArchive: true
           # Save the cache with the hash of the lock files.
           key: composer-${{ hashFiles('**/composer.lock') }}
           # If there is no direct hit, restore the latest composer-* cache. This

@@ -28,7 +28,7 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
           path: ./*

@@ -15,6 +15,10 @@ on:
         description: 'The source cache key suffix'
         type: string
         default: 'npm'
+      source_path:
+        description: 'The path of the source cache'
+        type: string
+        default: ./*
       audit:
         description: 'Run npm audit'
         type: boolean
@@ -40,10 +44,10 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
-          path: ./*
+          path: ${{ inputs.source_path }}
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
 
@@ -53,7 +57,7 @@ jobs:
 
       - name: Run npm audit.
         run: |
-          npm --prefix frontend audit
+          npm --prefix ${{ inputs.directory }} audit
 
   lint:
     name: 'Lint'
@@ -62,10 +66,10 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
-          path: ./*
+          path: ${{ inputs.source_path }}
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
 
@@ -84,10 +88,10 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: restore-build
         with:
-          path: ./*
+          path: ${{ inputs.source_path }}
           # We are only interested in a direct hit.
           key: build-${{ github.sha }}-${{ inputs.source_key }}
 
@@ -97,4 +101,4 @@ jobs:
 
       - name: Run npm test.
         run: |
-          npm --prefix frontend run test
+          npm --prefix ${{ inputs.directory }} run test
