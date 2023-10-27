@@ -11,6 +11,10 @@ on:
         description: 'The source cache key suffix'
         type: string
         default: 'composer'
+      copy_ci_settings:
+        description: 'Optionally copy the settings.ci.php to settings.local.php. Also disables the db url for install.'
+        type: boolean
+        default: false
       sql_target_key:
         description: 'The target key for a SQL dump'
         type: string
@@ -51,8 +55,12 @@ jobs:
         run: exit 1
         if: steps.restore-build.outputs.cache-hit != 'true'
 
+      - name: Copy CI settings.
+        if: inputs.copy_ci_settings
+        run: cp ./docroot/sites/default/settings.ci.php ./docroot/sites/default/settings.local.php
+
       - name: Run an install from existing config.
-        run: ./vendor/bin/drush site:install --existing-config --db-url=mysql://db:db@db:3306/db
+        run: ./vendor/bin/drush site:install --existing-config ${{ !inputs.copy_ci_settings && '--db-url=mysql://db:db@db:3306/db' }}
 
       - name: Create a SQL dump.
         if: inputs.sql_target_key != ''
