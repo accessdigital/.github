@@ -60,7 +60,7 @@ jobs:
         run: cp ./docroot/sites/default/settings.ci.php ./docroot/sites/default/settings.local.php
 
       - name: Run an install from existing config.
-        run: ./vendor/bin/drush site:install --existing-config ${{ !inputs.copy_ci_settings && '--db-url=mysql://db:db@db:3306/db' }}
+        run: ./vendor/bin/drush site:install --existing-config ${{ !inputs.copy_ci_settings && '--db-url=mysql://db:db@db:3306/db' || '' }}
 
       - name: Create a SQL dump.
         if: inputs.sql_target_key != ''
