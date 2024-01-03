@@ -16,9 +16,13 @@ on:
         type: string
         default: 'composer'
       phpcs:
-        description: 'Run PHPCS checks'
+        description: 'Run PHP Coding Standards checks'
         type: boolean
         default: true
+      phpstan:
+        description: 'Run PHPStan checks'
+        type: boolean
+        default: false
       drupal_check:
         description: 'Directories for the Drupal Check scan, or empty to disable'
         type: string
@@ -55,6 +59,29 @@ jobs:
         run: |
           cd ${{ inputs.directory }}
           ./vendor/bin/phpcs
+
+  phpstan:
+    name: 'PHPStan'
+    if: inputs.phpstan
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container }}
+    steps:
+      - name: Restore build from a previous step.
+        uses: actions/cache/restore@v3
+        id: restore-build
+        with:
+          path: ./*
+          # We are only interested in a direct hit.
+          key: build-${{ github.sha }}-${{ inputs.source_key }}
+
+      - name: Abort if we have a source build cache miss.
+        run: exit 1
+        if: steps.restore-build.outputs.cache-hit != 'true'
+
+      - name: Run PHPStan.
+        run: |
+          cd ${{ inputs.directory }}
+          ./vendor/bin/phpstan
 
   drupal-check:
     name: 'Drupal Check Analysis'
