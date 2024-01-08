@@ -30,7 +30,7 @@ on:
       drupal_check_level:
         description: 'OptionDirectories for the Drupal Check scan, or empty to disable'
         type: string
-        default: 'ad'
+        default: 'a'
 
 defaults:
   run:
