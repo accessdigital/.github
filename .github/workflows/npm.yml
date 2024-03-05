@@ -140,8 +140,8 @@ jobs:
       - name: Check for changes to committed code.
         if: inputs.check_git
         run: |
-          git diff
-          git diff-index --quiet HEAD
+          git diff "${{ inputs.directory }}"
+          git diff-index --quiet HEAD "${{ inputs.directory }}"
 
       - name: Run tests.
         if: inputs.run_tests
