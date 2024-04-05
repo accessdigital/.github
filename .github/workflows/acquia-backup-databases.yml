@@ -33,7 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       databases: ${{ steps.get_databases.outputs.database_list }}
-      db_list: ${{ steps.get_databases.outputs.db_list }}
     steps:
       - name: Checking out code
         uses: actions/checkout@v3
@@ -72,15 +71,15 @@ jobs:
           # Processes the output of databases to allow the data to
           # be passed to the 'Backing up databases' step.
           delimiter="$(openssl rand -hex 8)"
-          echo "db_list<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "database_list<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo ${database_list} >> ${GITHUB_OUTPUT}
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
       - name: Backing up databases
         run: |
 
-          # Split db_list into an array.
-          IFS=', ' read -r -a backup_array <<< "${{ steps.get_databases.outputs.db_list }}"
+          # Split database_list into an array.
+          IFS=', ' read -r -a backup_array <<< "${{ steps.get_databases.outputs.database_list }}"
 
           # Loop through the array of databases and attempt to 
           # perform a backup for each database.
