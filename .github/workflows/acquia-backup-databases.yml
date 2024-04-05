@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       filter:
-        description: 'Optionally, provide a filter for the databases. See: https://docs.acquia.com/acquia-cli/commands/#api-environments-database-list'
+        description: 'Optionally, provide a filter for the databases. See: https://docs.acquia.com/acquia-cloud-platform/add-ons/acquia-cli/commands/api:applications:database-list'
         type: string
         required: false
       php_version:
@@ -45,7 +45,7 @@ jobs:
 
       - name: Installing dependencies
         run: |
-          curl -OL https://github.com/acquia/cli/releases/download/2.13.0/acli.phar
+          curl -OL https://github.com/acquia/cli/releases/download/2.24.0/acli.phar
           echo "ACLI downloaded!"
 
       - name: Authorizing with ACLI
