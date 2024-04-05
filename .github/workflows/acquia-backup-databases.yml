@@ -85,7 +85,7 @@ jobs:
           # perform a backup for each database.
           i=0
           while [ $i -lt ${#backup_array[@]} ]; do
-            php acli.phar api:environments:database-backup-create \
+            php acli.phar api:environments:database-backup-create \ 
               --no-interaction \ 
               ${{ secrets.ENVIRONMENT_ID }} \ 
               ${backup_array[$i]} \ 
