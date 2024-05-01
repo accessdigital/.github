@@ -58,6 +58,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up the SSH key and configuration
+        if: ${{ inputs.remote_repo }}
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.TARGET_SSH_KEY }}
+          config: ${{ secrets.SSH_CONFIG }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Fetch the remote branches
+        if: ${{ inputs.remote_repo }}
+        run: |
+          git remote add target ${{ secrets.TARGET_REPO }}
+          git fetch target
+
       - name: Checkout the target branch, creating if necessary
         run: git checkout ${{ inputs.branch }} || git checkout -b ${{ inputs.branch }}
 
@@ -102,16 +116,6 @@ jobs:
         if: ${{ !inputs.remote_repo }}
         run: git push origin ${{ inputs.branch }}
 
-      - name: Set up the SSH key and configuration
-        if: ${{ inputs.remote_repo }}
-        uses: shimataro/ssh-key-action@v2.3.1
-        with:
-          key: ${{ secrets.TARGET_SSH_KEY }}
-          config: ${{ secrets.SSH_CONFIG }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
       - name: Push the branch to a remote
         if: ${{ inputs.remote_repo }}
-        run: |
-          git remote add target ${{ secrets.TARGET_REPO }}
-          git push target ${{ inputs.branch }}
+        run: git push target ${{ inputs.branch }}
