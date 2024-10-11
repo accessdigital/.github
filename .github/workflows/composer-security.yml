@@ -57,4 +57,4 @@ jobs:
 
       - name: Run security checks.
         run: |
-          composer update --dry-run roave/security-advisories
+          composer require --dev --dry-run roave/security-advisories:@dev
