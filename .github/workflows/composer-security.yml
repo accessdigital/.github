@@ -16,7 +16,6 @@ on:
         type: string
         default: 'composer'
 
-
 defaults:
   run:
     shell: bash
@@ -57,4 +56,5 @@ jobs:
 
       - name: Run security checks.
         run: |
+          git config --global --add safe.directory $(realpath .)
           composer require --dev --dry-run roave/security-advisories:@dev

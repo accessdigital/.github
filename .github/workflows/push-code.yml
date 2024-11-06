@@ -40,6 +40,10 @@ on:
         description: 'Additional options to pass to composer when removing dev dependencies'
         type: string
         default: '-o --apcu-autoloader'
+      dry_run:
+        description: 'Whether or not to actually push the code to the remote'
+        type: boolean
+        default: false
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
