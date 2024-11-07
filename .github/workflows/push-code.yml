@@ -40,10 +40,6 @@ on:
         description: 'Additional options to pass to composer when removing dev dependencies'
         type: string
         default: '-o --apcu-autoloader'
-      dry_run:
-        description: 'Whether or not to actually push the code to the remote'
-        type: boolean
-        default: false
     secrets:
       ARTEFACT_REPO:
         description: 'URL of the artefact repo.'
@@ -74,7 +70,6 @@ jobs:
       COMMIT_MSG: ${{ github.event.head_commit.message }}
       COMMIT_SHA: ${{ github.sha }}
       COMMIT_REF: ${{ github.event.ref }}
-      DRY_RUN: ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
       GIT_AUTHOR_NAME: ${{ inputs.git_name }}
       GIT_AUTHOR_EMAIL: ${{ inputs.git_email }}
       GIT_COMMITTER_NAME: ${{ inputs.git_name }}
