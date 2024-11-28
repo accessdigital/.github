@@ -138,7 +138,9 @@ jobs:
         run: npm --prefix "${{ inputs.directory }}" run build
 
       - name: Check for changes to committed code.
-        if: inputs.check_git
+        # Skip if we already have a full build.
+        if: (inputs.target_key == '' || steps.target-build.outputs.cache-hit != 'true') &&
+          inputs.check_git
         run: |
           git diff "${{ inputs.directory }}"
           git diff-index --quiet HEAD "${{ inputs.directory }}"
