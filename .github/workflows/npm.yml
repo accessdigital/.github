@@ -22,6 +22,10 @@ on:
         description: 'The target path for the cache'
         type: string
         default: './*'
+      target_modules:
+        description: 'Whether to keep the node_modules directory from the target build.'
+        type: boolean
+        default: true
       ssh_config:
         description: 'Indicate we need to run SSH configuration for asset access'
         type: boolean
@@ -148,3 +152,8 @@ jobs:
       - name: Run tests.
         if: inputs.run_tests
         run: npm --prefix "${{ inputs.directory }}" run test
+
+      - name: Remove node_modules from the target build.
+        # Only run if we have a target build and we don't want to keep node_modules.
+        if: inputs.target_key != '' && inputs.target_modules != 'true'
+        run: rm -rf "${{ inputs.directory }}/node_modules"
