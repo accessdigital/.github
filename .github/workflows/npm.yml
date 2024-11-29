@@ -155,5 +155,5 @@ jobs:
 
       - name: Remove node_modules from the target build.
         # Only run if we have a target build and we don't want to keep node_modules.
-        if: inputs.target_key != '' && inputs.target_modules != 'true'
+        if: (inputs.target_key != '' && inputs.target_modules != true)
         run: rm -rf "${{ inputs.directory }}/node_modules"
