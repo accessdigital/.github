@@ -83,7 +83,7 @@ jobs:
         # intended.
         run: |
           git checkout ${{ github.sha }} -- .
-          git diff ${{ github.sha }} --name-only | xargs -r git rm
+          git diff ${{ github.sha }} --name-only | tr '\n' '\0' | xargs -0 -r git rm
 
       - name: Ensure everything matches before proceeding
         run: |
