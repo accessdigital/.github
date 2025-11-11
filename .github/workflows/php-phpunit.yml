@@ -27,7 +27,7 @@ jobs:
     container: ${{ inputs.container }}
     services:
       db:
-        image: mysql:5.7
+        image: mariadb:10.6
         ports: [ 3306 ]
         env:
           MYSQL_USER: db
