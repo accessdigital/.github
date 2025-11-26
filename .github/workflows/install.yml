@@ -7,6 +7,10 @@ on:
         description: 'The docker image to use'
         type: string
         required: true
+      db_container:
+        description: 'The MySQL version'
+        type: string
+        default: 'mariadb:10.3'
       source_key:
         description: 'The source cache key suffix'
         type: string
@@ -31,7 +35,7 @@ jobs:
     container: ${{ inputs.container }}
     services:
       db:
-        image: mariadb:10.3
+        image: ${{ inputs.db_container }}
         ports: [3306]
         env:
           MYSQL_USER: db
