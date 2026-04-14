@@ -46,21 +46,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the code with a token
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         if: ${{ !inputs.remote_repo }}
         with:
           fetch-depth: 0
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
       - name: Check out the code without a token
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         if: ${{ inputs.remote_repo }}
         with:
           fetch-depth: 0
 
       - name: Set up the SSH key and configuration
         if: ${{ inputs.remote_repo }}
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.TARGET_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}

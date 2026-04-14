@@ -19,7 +19,7 @@ on:
         required: true
       KNOWN_HOSTS:
         description: 'SSH known hosts'
-        required: true      
+        required: true
 
 defaults:
   run:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           # Ensure PRs check out the right commit.
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up the SSH key and configuration
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.TARGET_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}

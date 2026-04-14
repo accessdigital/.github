@@ -44,7 +44,7 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v5
         id: restore-build
         with:
           path: ${{ inputs.source_path }}
@@ -66,7 +66,7 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v5
         id: restore-build
         with:
           path: ${{ inputs.source_path }}
@@ -88,7 +88,7 @@ jobs:
     container: ${{ inputs.container }}
     steps:
       - name: Restore build from a previous step.
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v5
         id: restore-build
         with:
           path: ${{ inputs.source_path }}
