@@ -54,13 +54,13 @@ jobs:
       PANTHEON_REPO: ${{ secrets.PANTHEON_REPO }}
     steps:
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           # Use a substantial depth so pantheon doesn't have orphans.
           fetch-depth: 50
 
       - name: Set up the SSH key and configuration.
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.PANTHEON_SSH_KEY }}
           config: ${{ secrets.SSH_CONFIG }}
